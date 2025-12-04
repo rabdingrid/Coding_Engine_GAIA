@@ -89,9 +89,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Database connection pool (will be initialized on startup)
-db_pool = None
-
 # Resource limits for security
 MAX_CPU_TIME = 10  # seconds
 MAX_MEMORY = 1024 * 1024 * 1024  # 1GB
