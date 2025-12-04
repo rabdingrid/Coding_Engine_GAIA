@@ -1,0 +1,12 @@
+{
+  "id": "Q023",
+  "uuid": "6c4cc125-3c2b-558a-ab65-7947a5a47847",
+  "title": "Lowest Common Ancestor",
+  "category": "Tree",
+  "difficulty": "Medium",
+  "tags": [
+    "Tree",
+    "DFS"
+  ],
+  "test_case_count": 20
+}

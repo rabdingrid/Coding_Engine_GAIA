@@ -1,0 +1,31 @@
+Container App URL: https://ai-ta-ra-code-executor2--0000020.happypond-428960e8.eastus2.azurecontainerapps.io
+
+================================================================================
+YOUR SYSTEM - Copy and run this:
+================================================================================
+
+curl -X POST "https://ai-ta-ra-code-executor2--0000020.happypond-428960e8.eastus2.azurecontainerapps.io/execute" -H "Content-Type: application/json" -d '{"language":"java","code":"public class Main { public static void main(String[] args) { java.util.Scanner s = new java.util.Scanner(System.in); int n = s.nextInt(); if (n <= 2) { System.out.println(n); return; } int a = 1, b = 2; for (int i = 3; i <= n; i++) { int t = a + b; a = b; b = t; } System.out.println(b); } }","test_cases":[{"id":"test_1","input":"2","expected_output":"2"},{"id":"test_2","input":"3","expected_output":"3"},{"id":"test_3","input":"4","expected_output":"5"},{"id":"test_4","input":"5","expected_output":"8"},{"id":"test_5","input":"1","expected_output":"1"}],"user_id":"user_your_system","question_id":"15"}'
+
+================================================================================
+FRIEND'S SYSTEM - Copy and run this:
+================================================================================
+
+curl -X POST "https://ai-ta-ra-code-executor2--0000020.happypond-428960e8.eastus2.azurecontainerapps.io/execute" -H "Content-Type: application/json" -d '{"language":"java","code":"public class Main { public static void main(String[] args) { java.util.Scanner s = new java.util.Scanner(System.in); int n = s.nextInt(); if (n <= 2) { System.out.println(n); return; } int a = 1, b = 2; for (int i = 3; i <= n; i++) { int t = a + b; a = b; b = t; } System.out.println(b); } }","test_cases":[{"id":"test_1","input":"2","expected_output":"2"},{"id":"test_2","input":"3","expected_output":"3"},{"id":"test_3","input":"4","expected_output":"5"},{"id":"test_4","input":"5","expected_output":"8"},{"id":"test_5","input":"1","expected_output":"1"}],"user_id":"user_friend_system","question_id":"15"}'
+
+================================================================================
+INSTRUCTIONS:
+================================================================================
+1. Copy the first command → Run on YOUR system
+2. Copy the second command → Send to your FRIEND
+3. Run BOTH commands at the SAME TIME (or within 1-2 seconds)
+4. Check the "container_id" in both responses - should be the SAME if 1 container handled both
+
+================================================================================
+EXPECTED RESULT:
+================================================================================
+Both should return:
+- "all_passed": true
+- "passed": 5, "total_tests": 5
+- Same "container_id" (proves 1 container handled both users)
+
+

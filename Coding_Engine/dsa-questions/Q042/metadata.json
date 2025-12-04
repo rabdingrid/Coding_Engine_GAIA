@@ -1,0 +1,12 @@
+{
+  "id": "Q042",
+  "uuid": "4c2d6491-311c-568d-8470-7f243778267b",
+  "title": "N-Queens",
+  "category": "Backtracking",
+  "difficulty": "Hard",
+  "tags": [
+    "Backtracking",
+    "Recursion"
+  ],
+  "test_case_count": 20
+}

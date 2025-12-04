@@ -1,0 +1,12 @@
+{
+  "id": "Q004",
+  "uuid": "d185e109-0475-50ab-b9c1-c1a2b93efc12",
+  "title": "Valid Parentheses",
+  "category": "String",
+  "difficulty": "Easy",
+  "tags": [
+    "String",
+    "Stack"
+  ],
+  "test_case_count": 20
+}

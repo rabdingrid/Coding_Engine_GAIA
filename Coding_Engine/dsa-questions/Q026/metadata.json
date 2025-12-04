@@ -1,0 +1,12 @@
+{
+  "id": "Q026",
+  "uuid": "1f91a5e3-c13f-5955-8187-f5251af5a365",
+  "title": "Course Schedule",
+  "category": "Graph",
+  "difficulty": "Medium",
+  "tags": [
+    "Graph",
+    "Topological Sort"
+  ],
+  "test_case_count": 20
+}

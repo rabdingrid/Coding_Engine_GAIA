@@ -1,0 +1,12 @@
+{
+  "id": "Q009",
+  "uuid": "4bb77c02-7edd-53aa-9332-c8f0f641673b",
+  "title": "Find All Anagrams in a String",
+  "category": "String",
+  "difficulty": "Medium",
+  "tags": [
+    "String",
+    "Sliding Window"
+  ],
+  "test_case_count": 20
+}

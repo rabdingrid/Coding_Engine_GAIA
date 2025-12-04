@@ -1,0 +1,70 @@
+================================================================================
+C++ TOTAL WEIGHT OF CANS - Curl Command
+================================================================================
+
+Container App URL:
+https://ai-ta-ra-code-executor2--0000025.happypond-428960e8.eastus2.azurecontainerapps.io
+
+================================================================================
+CURL COMMAND (Single Line):
+================================================================================
+curl -X POST "https://ai-ta-ra-code-executor2--0000025.happypond-428960e8.eastus2.azurecontainerapps.io/execute" -H "Content-Type: application/json" -d '{"language":"cpp","code":"#include <bits/stdc++.h>\n\nusing namespace std;\n\nstring ltrim(const string &);\nstring rtrim(const string &);\n\nint findTotalWeight(vector<int> cans) {\n    int total = 0;\n    while (!cans.empty()) {\n        // Find the minimum weight and its index\n        int minWeight = cans[0];\n        int minIndex = 0;\n        for (int i = 1; i < cans.size(); i++) {\n            if (cans[i] < minWeight) {\n                minWeight = cans[i];\n                minIndex = i;\n            }\n        }\n        // Add the minimum weight to total\n        total += minWeight;\n        // Determine the range to remove\n        // Remove the minimum can and its two adjacent cans (or fewer if at edge)\n        int startIdx = max(0, minIndex - 1);\n        int endIdx = min((int)cans.size() - 1, minIndex + 1);\n        // Remove elements from end to start to maintain indices\n        cans.erase(cans.begin() + startIdx, cans.begin() + endIdx + 1);\n    }\n    return total;\n}\n\nint main()\n{\n    string cans_count_temp;\n    getline(cin, cans_count_temp);\n    int cans_count = stoi(ltrim(rtrim(cans_count_temp)));\n    vector<int> cans(cans_count);\n    for (int i = 0; i < cans_count; i++) {\n        string cans_item_temp;\n        getline(cin, cans_item_temp);\n        int cans_item = stoi(ltrim(rtrim(cans_item_temp)));\n        cans[i] = cans_item;\n    }\n    int result = findTotalWeight(cans);\n    cout << result << \"\\n\";\n    return 0;\n}\n\nstring ltrim(const string &str) {\n    string s(str);\n    s.erase(\n        s.begin(),\n        find_if(s.begin(), s.end(), not1(ptr_fun<int, int>(isspace)))\n    );\n    return s;\n}\n\nstring rtrim(const string &str) {\n    string s(str);\n    s.erase(\n        find_if(s.rbegin(), s.rend(), not1(ptr_fun<int, int>(isspace))).base(),\n        s.end()\n    );\n    return s;\n}","test_cases":[{"id":"test_1","input":"3\n5\n2\n8","expected_output":"7"},{"id":"test_2","input":"4\n1\n3\n2\n4","expected_output":"4"},{"id":"test_3","input":"5\n10\n5\n15\n3\n7","expected_output":"13"}],"user_id":"test_cpp_cans","question_id":"cpp_test"}'
+
+================================================================================
+USING TEST SCRIPT (Recommended):
+================================================================================
+cd /Users/rabdin/Documents/AGCodingEngine/Coding_Engine/aca-executor/test-ui
+./test-cpp-cans.sh
+
+================================================================================
+TEST RESULTS:
+================================================================================
+✅ Code compiles and runs successfully
+✅ Execution time: ~13ms per test (very fast!)
+❌ Algorithm logic doesn't match expected outputs
+
+Test 1: [5, 2, 8]
+  Expected: 7
+  Got: 2
+  Algorithm trace:
+    Step 1: Min = 2 at index 1, remove indices 0-2, total = 2
+    Result: 2
+
+Test 2: [1, 3, 2, 4]
+  Expected: 4
+  Got: 3
+  Algorithm trace:
+    Step 1: Min = 1 at index 0, remove indices 0-1, total = 1, cans = [2, 4]
+    Step 2: Min = 2 at index 0, remove indices 0-1, total = 3, cans = []
+    Result: 3
+
+Test 3: [10, 5, 15, 3, 7]
+  Expected: 13
+  Got: 8
+  Algorithm trace:
+    Step 1: Min = 3 at index 3, remove indices 2-4, total = 3, cans = [10, 5]
+    Step 2: Min = 5 at index 1, remove indices 0-1, total = 8, cans = []
+    Result: 8
+
+================================================================================
+ANALYSIS:
+================================================================================
+The code executes correctly in the container, but the algorithm logic produces
+different results than expected. This could mean:
+
+1. The problem interpretation might be different
+2. The expected outputs might be for a different problem variant
+3. The algorithm might need adjustment for edge cases
+
+The code itself is syntactically correct and compiles/runs without errors.
+
+================================================================================
+METADATA:
+================================================================================
+- Execution Time: ~13ms per test
+- Container ID: ai-ta-ra-code-executor2--0000025-...
+- CPU Usage: ~0% (very fast execution)
+- Memory Usage: ~0.6 MB
+- Language: C++ (compiled with g++)
+
+

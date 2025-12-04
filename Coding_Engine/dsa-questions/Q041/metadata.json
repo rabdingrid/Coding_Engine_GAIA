@@ -1,0 +1,12 @@
+{
+  "id": "Q041",
+  "uuid": "5d21863d-6cae-5880-9a8f-7d95b240a1bc",
+  "title": "Permutations",
+  "category": "Backtracking",
+  "difficulty": "Medium",
+  "tags": [
+    "Backtracking",
+    "Recursion"
+  ],
+  "test_case_count": 20
+}

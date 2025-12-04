@@ -1,0 +1,12 @@
+{
+  "id": "Q043",
+  "uuid": "b17d65f4-deda-578e-a612-ebe48d169746",
+  "title": "Sudoku Solver",
+  "category": "Backtracking",
+  "difficulty": "Hard",
+  "tags": [
+    "Backtracking",
+    "Recursion"
+  ],
+  "test_case_count": 20
+}

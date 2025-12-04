@@ -1,0 +1,12 @@
+{
+  "id": "Q029",
+  "uuid": "ca10584c-9186-5d5a-bfda-4fc8f0b28355",
+  "title": "Cheapest Flights Within K Stops",
+  "category": "Graph",
+  "difficulty": "Medium",
+  "tags": [
+    "Graph",
+    "BFS"
+  ],
+  "test_case_count": 20
+}

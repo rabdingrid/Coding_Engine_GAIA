@@ -1,0 +1,12 @@
+{
+  "id": "Q033",
+  "uuid": "df745d63-509a-526b-9075-37cbe4db07cc",
+  "title": "Longest Increasing Subsequence",
+  "category": "DP",
+  "difficulty": "Medium",
+  "tags": [
+    "DP",
+    "Binary Search"
+  ],
+  "test_case_count": 20
+}

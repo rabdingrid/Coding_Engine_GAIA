@@ -1,0 +1,12 @@
+{
+  "id": "Q018",
+  "uuid": "e856c67b-80c3-53a1-8808-171319c9db7b",
+  "title": "Invert Binary Tree",
+  "category": "Tree",
+  "difficulty": "Easy",
+  "tags": [
+    "Tree",
+    "DFS"
+  ],
+  "test_case_count": 20
+}

@@ -1,0 +1,12 @@
+{
+  "id": "Q030",
+  "uuid": "8ec3ec81-b0ea-5b29-86be-9ba3529d37ed",
+  "title": "Redundant Connection",
+  "category": "Graph",
+  "difficulty": "Medium",
+  "tags": [
+    "Graph",
+    "Union Find"
+  ],
+  "test_case_count": 20
+}

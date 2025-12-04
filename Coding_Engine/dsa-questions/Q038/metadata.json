@@ -1,0 +1,11 @@
+{
+  "id": "Q038",
+  "uuid": "ea423368-fa6d-5b9d-bd2a-d01360af1086",
+  "title": "Unique Paths",
+  "category": "DP",
+  "difficulty": "Medium",
+  "tags": [
+    "DP"
+  ],
+  "test_case_count": 20
+}

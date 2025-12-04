@@ -1,0 +1,11 @@
+{
+  "id": "Q045",
+  "uuid": "6d0c42f9-92b9-5787-be77-ce2991853beb",
+  "title": "Search in Rotated Sorted Array",
+  "category": "Search",
+  "difficulty": "Medium",
+  "tags": [
+    "Binary Search"
+  ],
+  "test_case_count": 20
+}

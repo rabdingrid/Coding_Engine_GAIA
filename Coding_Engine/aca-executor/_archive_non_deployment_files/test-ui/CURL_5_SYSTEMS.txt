@@ -1,0 +1,72 @@
+Container App URL: https://ai-ta-ra-code-executor2--0000025.happypond-428960e8.eastus2.azurecontainerapps.io
+
+================================================================================
+5 CURL COMMANDS FOR 5 DIFFERENT SYSTEMS - Concurrent Load Test
+================================================================================
+
+=== SYSTEM 1 - Climbing Stairs (Java) ===
+User ID: system_1_java
+Question ID: 15
+
+curl -X POST "https://ai-ta-ra-code-executor2--0000025.happypond-428960e8.eastus2.azurecontainerapps.io/execute" -H "Content-Type: application/json" -d '{"language":"java","code":"public class Main { public static void main(String[] args) { java.util.Scanner s = new java.util.Scanner(System.in); int n = s.nextInt(); if (n <= 2) { System.out.println(n); return; } int a = 1, b = 2; for (int i = 3; i <= n; i++) { int t = a + b; a = b; b = t; } System.out.println(b); } }","test_cases":[{"id":"test_1","input":"2","expected_output":"2"},{"id":"test_2","input":"3","expected_output":"3"},{"id":"test_3","input":"4","expected_output":"5"}],"user_id":"system_1_java","question_id":"15"}'
+
+================================================================================
+=== SYSTEM 2 - Two Sum (Python) ===
+User ID: system_2_python
+Question ID: 1
+
+curl -X POST "https://ai-ta-ra-code-executor2--0000025.happypond-428960e8.eastus2.azurecontainerapps.io/execute" -H "Content-Type: application/json" -d '{"language":"python","code":"nums = list(map(int, input().split()))\ntarget = int(input())\nfor i in range(len(nums)):\n    for j in range(i+1, len(nums)):\n        if nums[i] + nums[j] == target:\n            print(\"[\" + str(i) + \",\" + str(j) + \"]\")\n            exit()\nprint(\"[]\")","test_cases":[{"id":"test_1","input":"2 7 11 15\n9","expected_output":"[0,1]"},{"id":"test_2","input":"3 2 4\n6","expected_output":"[1,2]"}],"user_id":"system_2_python","question_id":"1"}'
+
+================================================================================
+=== SYSTEM 3 - Maximum Subarray (JavaScript) ===
+User ID: system_3_javascript
+Question ID: 2
+
+curl -X POST "https://ai-ta-ra-code-executor2--0000025.happypond-428960e8.eastus2.azurecontainerapps.io/execute" -H "Content-Type: application/json" -d '{"language":"javascript","code":"const readline = require(\"readline\");\nconst rl = readline.createInterface({ input: process.stdin, output: process.stdout });\nrl.on(\"line\", (line) => {\n  const nums = JSON.parse(line.trim());\n  let maxSum = nums[0];\n  let currentSum = nums[0];\n  for (let i = 1; i < nums.length; i++) {\n    currentSum = Math.max(nums[i], currentSum + nums[i]);\n    maxSum = Math.max(maxSum, currentSum);\n  }\n  console.log(maxSum);\n  rl.close();\n});","test_cases":[{"id":"test_1","input":"[-2,1,-3,4,-1,2,1,-5,4]","expected_output":"6"},{"id":"test_2","input":"[1]","expected_output":"1"}],"user_id":"system_3_javascript","question_id":"2"}'
+
+================================================================================
+=== SYSTEM 4 - Climbing Stairs (Java) ===
+User ID: system_4_java
+Question ID: 15
+
+curl -X POST "https://ai-ta-ra-code-executor2--0000025.happypond-428960e8.eastus2.azurecontainerapps.io/execute" -H "Content-Type: application/json" -d '{"language":"java","code":"public class Main { public static void main(String[] args) { java.util.Scanner s = new java.util.Scanner(System.in); int n = s.nextInt(); if (n <= 2) { System.out.println(n); return; } int a = 1, b = 2; for (int i = 3; i <= n; i++) { int t = a + b; a = b; b = t; } System.out.println(b); } }","test_cases":[{"id":"test_1","input":"3","expected_output":"3"},{"id":"test_2","input":"4","expected_output":"5"}],"user_id":"system_4_java","question_id":"15"}'
+
+================================================================================
+=== SYSTEM 5 - Two Sum (Python) ===
+User ID: system_5_python
+Question ID: 1
+
+curl -X POST "https://ai-ta-ra-code-executor2--0000025.happypond-428960e8.eastus2.azurecontainerapps.io/execute" -H "Content-Type: application/json" -d '{"language":"python","code":"nums = list(map(int, input().split()))\ntarget = int(input())\nfor i in range(len(nums)):\n    for j in range(i+1, len(nums)):\n        if nums[i] + nums[j] == target:\n            print(\"[\" + str(i) + \",\" + str(j) + \"]\")\n            exit()\nprint(\"[]\")","test_cases":[{"id":"test_1","input":"3 3\n6","expected_output":"[0,1]"},{"id":"test_2","input":"1 2 3 4\n7","expected_output":"[2,3]"}],"user_id":"system_5_python","question_id":"1"}'
+
+================================================================================
+INSTRUCTIONS:
+================================================================================
+1. Distribute these 5 commands to 5 different systems
+2. Run ALL 5 commands at the EXACT SAME TIME
+3. With Gunicorn (8 concurrent per replica), all 5 should complete successfully
+4. Check container_id - all should be the same (1 replica handling all 5)
+
+================================================================================
+EXPECTED RESULT:
+================================================================================
+- All 5 requests complete successfully
+- All return "all_passed": true
+- Same container_id (proves 1 replica handled all 5)
+- No hanging (Gunicorn queue working!)
+- Execution times vary by language (Java ~3s, Python ~0.05s, JS ~0.1s)
+
+================================================================================
+TESTING GUNICORN CAPACITY:
+================================================================================
+- 1 replica with Gunicorn = 8 concurrent capacity
+- Testing with 5 concurrent requests
+- Should all complete successfully (well within capacity)
+
+================================================================================
+MONITORING:
+================================================================================
+- Open monitoring-dashboard.html to see all 5 executions
+- All should show same container_id
+- Different user_ids: system_1_java, system_2_python, system_3_javascript, etc.
+
+

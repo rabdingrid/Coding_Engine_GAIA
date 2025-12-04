@@ -1,0 +1,12 @@
+{
+  "id": "Q002",
+  "uuid": "91a260c5-a545-5006-943d-423b1b52cf18",
+  "title": "Maximum Subarray",
+  "category": "Array",
+  "difficulty": "Medium",
+  "tags": [
+    "Array",
+    "DP"
+  ],
+  "test_case_count": 20
+}

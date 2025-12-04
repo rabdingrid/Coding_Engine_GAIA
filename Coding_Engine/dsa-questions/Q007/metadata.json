@@ -1,0 +1,12 @@
+{
+  "id": "Q007",
+  "uuid": "55ace37c-f0d9-5551-8fee-e25943d9fdc5",
+  "title": "Product of Array Except Self",
+  "category": "Array",
+  "difficulty": "Medium",
+  "tags": [
+    "Array",
+    "Prefix Sum"
+  ],
+  "test_case_count": 20
+}

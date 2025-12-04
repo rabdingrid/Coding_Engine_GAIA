@@ -1,0 +1,100 @@
+================================================================================
+ODD FREQUENCY SUM - Fixed Curl Command
+================================================================================
+
+⚠️  ISSUES WITH ORIGINAL CODE:
+  1. Used fs.readFileSync() - BLOCKED by security
+  2. Format: testCases vs test_cases
+  3. URL: localhost:3000 vs deployed executor
+
+✅ FIXED VERSION:
+  - Uses process.stdin for multi-line input (security-compliant)
+  - Correct format: test_cases (snake_case)
+  - Points to deployed executor
+
+================================================================================
+CONTAINER APP URL:
+================================================================================
+https://ai-ta-ra-code-executor2--0000025.happypond-428960e8.eastus2.azurecontainerapps.io
+
+================================================================================
+CURL COMMAND (Single Line):
+================================================================================
+curl -X POST "https://ai-ta-ra-code-executor2--0000025.happypond-428960e8.eastus2.azurecontainerapps.io/execute" -H "Content-Type: application/json" -d '{"language":"javascript","code":"const readline = require(\"readline\");\nconst rl = readline.createInterface({ input: process.stdin, output: process.stdout });\nlet input = \"\";\nprocess.stdin.on(\"data\", (data) => {\n  input += data.toString();\n});\nprocess.stdin.on(\"end\", () => {\n  const lines = input.trim().split(\"\\n\").map(line => line.trim());\n  const n = parseInt(lines[0]);\n  const arr = lines.slice(1).map(Number);\n  const freq = {};\n  for (let x of arr) {\n    freq[x] = (freq[x] || 0) + 1;\n  }\n  let sum = 0;\n  for (let key in freq) {\n    if (freq[key] % 2 !== 0) {\n      sum += parseInt(key);\n    }\n  }\n  console.log(sum);\n});","test_cases":[{"id":"test_1","input":"5\n1\n2\n3\n2\n1","expected_output":"3"},{"id":"test_2","input":"7\n4\n4\n4\n5\n5\n6\n6","expected_output":"4"},{"id":"test_3","input":"60\n21\n42\n32\n12\n21\n12\n63\n21\n42\n32\n12\n21\n12\n63\n21\n42\n32\n12\n21\n12\n63\n21\n42\n32\n12\n21\n12\n63\n21\n42\n32\n12\n21\n12\n63\n21\n42\n32\n12\n21\n12\n63\n21\n42\n32\n12\n21\n12\n63\n21\n42\n32\n12\n21\n12\n63\n21\n42\n32\n12","expected_output":"309"}],"user_id":"test_odd_frequency","question_id":"test"}'
+
+================================================================================
+USING TEST SCRIPT (Recommended):
+================================================================================
+cd /Users/rabdin/Documents/AGCodingEngine/Coding_Engine/aca-executor/test-ui
+./test-odd-frequency.sh
+
+================================================================================
+PROBLEM DESCRIPTION:
+================================================================================
+Given an array of integers, find the sum of all numbers that appear an odd 
+number of times.
+
+Example:
+  Input: 5
+         1 2 3 2 1
+  Output: 3 (1 appears 2 times, 2 appears 2 times, 3 appears 1 time (odd))
+
+Test Cases:
+  1. Input: "5\n1\n2\n3\n2\n1" → Expected: 3
+  2. Input: "7\n4\n4\n4\n5\n5\n6\n6" → Expected: 4
+  3. Input: "60\n21\n42\n32\n12\n21\n12\n63\n21\n42\n32\n12\n21\n12\n63\n21\n42\n32\n12\n21\n12\n63\n21\n42\n32\n12\n21\n12\n63\n21\n42\n32\n12\n21\n12\n63\n21\n42\n32\n12\n21\n12\n63\n21\n42\n32\n12\n21\n12\n63\n21\n42\n32\n12\n21\n12\n63\n21\n42\n32\n12" → Expected: 309
+
+================================================================================
+KEY CHANGES FROM ORIGINAL:
+================================================================================
+1. Removed: fs.readFileSync(0, "utf8")
+   Added: process.stdin.on("data") + process.stdin.on("end")
+   
+2. Changed: testCases → test_cases
+   
+3. Changed: localhost:3000/run → deployed executor /execute
+   
+4. Added: user_id and question_id fields
+
+================================================================================
+ACTUAL TEST RESULTS:
+================================================================================
+✅ Test 1: PASSED (Expected: 3, Got: 3)
+✅ Test 2: PASSED (Expected: 4, Got: 4)
+❌ Test 3: FAILED (Expected: 309, Got: 107)
+
+📊 Analysis:
+  - Test 3 input has 60 numbers
+  - Frequency: 21(17 times), 42(9 times), 32(9 times), 12(17 times), 63(8 times)
+  - Numbers with odd frequency: 21, 42, 32, 12
+  - Calculated sum: 21 + 42 + 32 + 12 = 107
+  - Expected: 309
+
+💡 Note: Test 3 expected output might be incorrect, or the input string might be 
+   incomplete. The code logic is working correctly - it correctly identifies 
+   numbers with odd frequency and sums them.
+
+✅ Code execution: WORKING
+✅ Security: WORKING (fs.readFileSync blocked)
+✅ Multi-line input: WORKING
+
+{
+  "summary": {
+    "all_passed": false,
+    "passed": 2,
+    "total_tests": 3,
+    "pass_percentage": 66.7
+  },
+  "test_results": [
+    {"passed": true, "expected_output": "3", "actual_output": "3\n"},
+    {"passed": true, "expected_output": "4", "actual_output": "4\n"},
+    {"passed": false, "expected_output": "309", "actual_output": "107\n"}
+  ],
+  "metadata": {
+    "execution_time_ms": ~120-130ms,
+    "container_id": "ai-ta-ra-code-executor2--0000025-...",
+    "cpu_usage_percent": ~130%,
+    "memory_usage_mb": ~35 MB
+  }
+}
+

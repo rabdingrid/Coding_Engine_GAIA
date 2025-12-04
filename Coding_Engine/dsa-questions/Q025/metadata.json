@@ -1,0 +1,12 @@
+{
+  "id": "Q025",
+  "uuid": "d82b5bd1-0d71-51b6-97d8-9b13ad6a2d44",
+  "title": "Clone Graph",
+  "category": "Graph",
+  "difficulty": "Medium",
+  "tags": [
+    "Graph",
+    "DFS"
+  ],
+  "test_case_count": 20
+}

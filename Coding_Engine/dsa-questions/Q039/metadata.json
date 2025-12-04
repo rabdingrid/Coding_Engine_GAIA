@@ -1,0 +1,12 @@
+{
+  "id": "Q039",
+  "uuid": "b986f150-0ab7-5d1c-adfb-f29b305adde4",
+  "title": "Generate Parentheses",
+  "category": "Backtracking",
+  "difficulty": "Medium",
+  "tags": [
+    "Backtracking",
+    "Recursion"
+  ],
+  "test_case_count": 20
+}

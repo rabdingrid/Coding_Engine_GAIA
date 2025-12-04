@@ -1,0 +1,12 @@
+{
+  "id": "Q024",
+  "uuid": "b410a9c2-4190-5d1f-9401-ab6bd31f785b",
+  "title": "Number of Islands",
+  "category": "Graph",
+  "difficulty": "Medium",
+  "tags": [
+    "Graph",
+    "DFS"
+  ],
+  "test_case_count": 20
+}

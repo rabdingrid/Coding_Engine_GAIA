@@ -1,0 +1,12 @@
+{
+  "id": "Q005",
+  "uuid": "bf608792-1ccf-5c1a-b939-20aeb785279a",
+  "title": "Best Time to Buy and Sell Stock",
+  "category": "Array",
+  "difficulty": "Easy",
+  "tags": [
+    "Array",
+    "Greedy"
+  ],
+  "test_case_count": 20
+}

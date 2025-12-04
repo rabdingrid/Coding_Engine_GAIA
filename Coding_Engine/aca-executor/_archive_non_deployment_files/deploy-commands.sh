@@ -1,0 +1,20 @@
+#!/bin/bash
+# Copy and paste these commands one by one after starting Docker
+
+echo "🚀 C# Deployment Commands"
+echo ""
+echo "Step 1: Build image"
+echo "docker build -t executor-secure:v17-csharp ."
+echo ""
+echo "Step 2: Tag image"
+echo "docker tag executor-secure:v17-csharp aitaraacr1763805702.azurecr.io/executor-secure:v17-csharp"
+echo ""
+echo "Step 3: Login to ACR"
+echo "az acr login --name aitaraacr1763805702"
+echo ""
+echo "Step 4: Push image"
+echo "docker push aitaraacr1763805702.azurecr.io/executor-secure:v17-csharp"
+echo ""
+echo "Step 5: Apply Terraform"
+echo "cd terraform && terraform apply"
+echo ""

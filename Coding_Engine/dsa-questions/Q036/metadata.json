@@ -1,0 +1,11 @@
+{
+  "id": "Q036",
+  "uuid": "29ea5edc-191d-5145-a5b6-58387065205e",
+  "title": "House Robber",
+  "category": "DP",
+  "difficulty": "Medium",
+  "tags": [
+    "DP"
+  ],
+  "test_case_count": 20
+}

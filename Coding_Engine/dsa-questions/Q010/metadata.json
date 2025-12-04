@@ -1,0 +1,12 @@
+{
+  "id": "Q010",
+  "uuid": "36858490-cff1-545f-aaec-6ca581a85c30",
+  "title": "Group Anagrams",
+  "category": "String",
+  "difficulty": "Medium",
+  "tags": [
+    "String",
+    "Hash Table"
+  ],
+  "test_case_count": 20
+}

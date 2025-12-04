@@ -1,0 +1,12 @@
+{
+  "id": "Q008",
+  "uuid": "64f5c789-6c10-555e-a5c6-d9e1ae5a1f17",
+  "title": "Maximum Product Subarray",
+  "category": "Array",
+  "difficulty": "Medium",
+  "tags": [
+    "Array",
+    "DP"
+  ],
+  "test_case_count": 20
+}

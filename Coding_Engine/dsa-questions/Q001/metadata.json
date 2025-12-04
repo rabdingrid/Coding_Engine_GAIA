@@ -1,0 +1,12 @@
+{
+  "id": "Q001",
+  "uuid": "3a28702e-3afe-58cb-863a-53220f402f0e",
+  "title": "Two Sum",
+  "category": "Array",
+  "difficulty": "Easy",
+  "tags": [
+    "Array",
+    "Hash Table"
+  ],
+  "test_case_count": 20
+}

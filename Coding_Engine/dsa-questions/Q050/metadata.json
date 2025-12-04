@@ -1,0 +1,12 @@
+{
+  "id": "Q050",
+  "uuid": "555a50fe-00fb-5da7-96dd-34b7969ae184",
+  "title": "Largest Rectangle in Histogram",
+  "category": "Stack",
+  "difficulty": "Hard",
+  "tags": [
+    "Stack",
+    "Monotonic Stack"
+  ],
+  "test_case_count": 20
+}

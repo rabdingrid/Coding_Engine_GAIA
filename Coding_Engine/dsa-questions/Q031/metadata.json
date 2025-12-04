@@ -1,0 +1,11 @@
+{
+  "id": "Q031",
+  "uuid": "9409b5fd-4178-584e-82b5-e6a87a23bd5c",
+  "title": "Climbing Stairs",
+  "category": "DP",
+  "difficulty": "Easy",
+  "tags": [
+    "DP"
+  ],
+  "test_case_count": 20
+}

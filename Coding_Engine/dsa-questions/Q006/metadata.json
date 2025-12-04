@@ -1,0 +1,12 @@
+{
+  "id": "Q006",
+  "uuid": "8fa28b81-896d-5a55-b468-f20cb73287af",
+  "title": "Contains Duplicate",
+  "category": "Array",
+  "difficulty": "Easy",
+  "tags": [
+    "Array",
+    "Hash Table"
+  ],
+  "test_case_count": 20
+}

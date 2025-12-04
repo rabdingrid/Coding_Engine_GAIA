@@ -1,0 +1,12 @@
+{
+  "id": "Q020",
+  "uuid": "1dd8aa8e-cba3-5f35-bbca-b2d23e3eef38",
+  "title": "Validate Binary Search Tree",
+  "category": "Tree",
+  "difficulty": "Medium",
+  "tags": [
+    "Tree",
+    "DFS"
+  ],
+  "test_case_count": 20
+}
