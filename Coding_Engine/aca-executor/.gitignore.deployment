@@ -1,0 +1,11 @@
+# Hide everything except deployment files
+*
+!.gitignore
+!.gitignore.deployment
+!executor-service-fastapi.py
+!Dockerfile.fastapi
+!requirements-fastapi.txt
+!terraform/
+terraform/*
+!terraform/*.tf
+!terraform/*.tfvars.example
