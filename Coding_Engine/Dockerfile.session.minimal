@@ -1,0 +1,16 @@
+# Minimal test container - just to verify Azure forwarding works
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy minimal adapter
+COPY adapter-service-minimal.js /app/adapter-service.js
+
+# Use Azure-provided port or default to 2000
+ENV PORT=2000
+
+# EXPOSE matches --target-port in session pool
+EXPOSE 2000
+
+CMD ["node", "/app/adapter-service.js"]
+

@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Executor Test UI - Database Integrated</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/monokai.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/clike/clike.min.js"></script>
+    <style>
+        .CodeMirror {
+            height: 100% !important;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen flex flex-col">
+        <!-- Header -->
+        <header class="bg-white border-b border-gray-200 px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl text-purple-600">&lt;/&gt;</span>
+                    <h1 class="text-2xl font-semibold text-gray-800">Code Executor Test UI</h1>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="text-right mr-4">
+                        <div class="text-xs text-gray-500">User ID:</div>
+                        <div class="text-sm font-mono text-gray-700" id="user-id-display">Loading...</div>
+                        <button onclick="resetUserId()" class="mt-1 px-2 py-1 bg-gray-200 text-gray-700 rounded text-xs hover:bg-gray-300">
+                            New ID
+                        </button>
+                    </div>
+                    <div class="text-sm text-gray-600">
+                        Executor: <span id="executor-url" class="font-mono text-blue-600">Loading...</span>
+                    </div>
+                    <button onclick="testExecutorConnection()" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 text-sm">
+                        Test Executor
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex overflow-hidden">
+            <!-- Left Sidebar - Questions List -->
+            <div class="w-64 bg-white border-r border-gray-200 flex flex-col">
+                <!-- Questions Header -->
+                <div class="p-4 border-b border-gray-200">
+                    <div class="flex items-center justify-between mb-3">
+                        <h2 class="text-lg font-semibold">Questions</h2>
+                    </div>
+                    <button onclick="loadQuestions()" class="w-full px-3 py-2 bg-blue-500 text-white rounded text-sm hover:bg-blue-600">
+                        ↻ Refresh
+                    </button>
+                </div>
+
+                <!-- Questions List -->
+                <div id="questions-list" class="flex-1 overflow-y-auto p-2">
+                    <p class="text-gray-500 text-sm text-center py-4">Loading questions...</p>
+                </div>
+            </div>
+
+            <!-- Middle Panel - Problem & Test Cases -->
+            <div class="w-1/3 bg-white border-r border-gray-200 overflow-y-auto p-6">
+                <div id="question-details">
+                    <p class="text-gray-500 text-center py-8">Select a question from the left sidebar</p>
+                </div>
+            </div>
+
+            <!-- Right Panel - Code Editor & Results -->
+            <div class="flex-1 flex flex-col bg-white">
+                <!-- Language Selection -->
+                <div class="border-b border-gray-200 px-6 py-3">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Language</label>
+                    <select id="language" class="px-3 py-2 border border-gray-300 rounded-lg" onchange="changeLanguage()">
+                        <option value="python">Python</option>
+                        <option value="javascript">JavaScript</option>
+                        <option value="java">Java</option>
+                        <option value="cpp">C++</option>
+                    </select>
+                </div>
+
+                <!-- Code Editor -->
+                <div class="flex-1 border-b border-gray-200" style="height: 400px;">
+                    <textarea id="code-editor"></textarea>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="border-b border-gray-200 px-6 py-4 flex gap-3">
+                    <button onclick="runCode()" id="run-btn" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                        ▶ Run Code
+                    </button>
+                    <button onclick="resetCode()" class="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600">
+                        ↻ Reset
+                    </button>
+                </div>
+
+                <!-- Results -->
+                <div class="flex-1 overflow-y-auto p-6">
+                    <h3 class="text-lg font-semibold mb-4">Results</h3>
+                    <div id="results" class="space-y-4">
+                        <p class="text-gray-500">Click "Run Code" to see results...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        const API_BASE_URL = 'http://localhost:3001/api'; // Backend API server
+        const EXECUTOR_URL = 'https://ai-ta-ra-code-executor2.happypond-428960e8.eastus2.azurecontainerapps.io';
+        
+        let editor;
+        let currentLanguage = 'python';
+        let currentQuestionId = null;
+        let currentTestCases = [];
+        let currentUserId = null;
+        
+        // Generate or retrieve unique user ID per browser
+        function getUserId() {
+            if (currentUserId) {
+                return currentUserId;
+            }
+            
+            let userId = localStorage.getItem('user_id');
+            if (!userId) {
+                // Generate unique ID: user_timestamp_random
+                userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('user_id', userId);
+            }
+            currentUserId = userId;
+            return userId;
+        }
+
+        // Initialize CodeMirror
+        function initEditor() {
+            editor = CodeMirror.fromTextArea(document.getElementById('code-editor'), {
+                lineNumbers: true,
+                theme: 'monokai',
+                mode: 'python',
+                indentUnit: 4,
+                indentWithTabs: false,
+                lineWrapping: true
+            });
+            setDefaultCode('python');
+        }
+
+        // Set default code
+        function setDefaultCode(lang) {
+            const defaults = {
+                python: `def solution():
+    # Write your code here
+    pass
+
+# Example: Read input and print output
+n = int(input())
+print(n * 2)`,
+                javascript: `// Write your code here
+const readline = require('readline');
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
+
+rl.on('line', (line) => {
+    const n = parseInt(line);
+    console.log(n * 2);
+    rl.close();
+});`,
+                java: `public class Main {
+    public static void main(String[] args) {
+        // Write your code here
+        java.util.Scanner scanner = new java.util.Scanner(System.in);
+        int n = scanner.nextInt();
+        System.out.println(n * 2);
+    }
+}`,
+                cpp: `#include <iostream>
+using namespace std;
+
+int main() {
+    // Write your code here
+    int n;
+    cin >> n;
+    cout << n * 2 << endl;
+    return 0;
+}`
+            };
+            editor.setValue(defaults[lang] || defaults.python);
+        }
+
+        // Change language
+        function changeLanguage() {
+            currentLanguage = document.getElementById('language').value;
+            const modes = {
+                python: 'python',
+                javascript: 'javascript',
+                java: 'text/x-java',
+                cpp: 'text/x-c++src'
+            };
+            editor.setOption('mode', modes[currentLanguage] || 'python');
+            setDefaultCode(currentLanguage);
+        }
+
+        // Load questions from database
+        async function loadQuestions() {
+            const listDiv = document.getElementById('questions-list');
+            listDiv.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">Loading...</p>';
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/questions`);
+                const data = await response.json();
+
+                if (data.success && data.questions) {
+                    if (data.questions.length === 0) {
+                        listDiv.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">No questions in database yet.</p>';
+                        return;
+                    }
+
+                    listDiv.innerHTML = data.questions.map(q => {
+                        // Clean title - extract first line or first 50 chars if it's HTML
+                        let cleanTitle = q.title || 'Untitled Question';
+                        if (cleanTitle.includes('<') || cleanTitle.length > 100) {
+                            cleanTitle = stripHtml(cleanTitle).substring(0, 60).trim();
+                            if (cleanTitle.length >= 60) cleanTitle += '...';
+                        }
+                        return `
+                        <div onclick="loadQuestion('${q.id}')" class="p-3 mb-2 border border-gray-200 rounded-lg cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition-colors">
+                            <div class="font-medium text-sm text-gray-900">${escapeHtml(cleanTitle)}</div>
+                            <div class="text-xs text-gray-500 mt-1">${q.difficulty || 'Medium'}</div>
+                        </div>
+                    `;
+                    }).join('');
+                } else {
+                    listDiv.innerHTML = '<p class="text-red-500 text-sm text-center py-4">Error loading questions</p>';
+                }
+            } catch (error) {
+                console.error('Error loading questions:', error);
+                listDiv.innerHTML = '<p class="text-red-500 text-sm text-center py-4">Error: ' + error.message + '</p>';
+            }
+        }
+
+        // Load question details
+        async function loadQuestion(questionId) {
+            currentQuestionId = questionId;
+            const detailsDiv = document.getElementById('question-details');
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/questions/${questionId}`);
+                const data = await response.json();
+
+                if (data.success && data.question) {
+                    const question = data.question;
+                    currentTestCases = data.test_cases || [];
+
+                    // Clean title - strip HTML if present
+                    let cleanTitle = question.title || 'Untitled Question';
+                    if (cleanTitle.includes('<') || cleanTitle.length > 200) {
+                        cleanTitle = stripHtml(cleanTitle).substring(0, 100).trim();
+                        if (cleanTitle.length >= 100) cleanTitle += '...';
+                    }
+                    
+                    detailsDiv.innerHTML = `
+                        <div class="mb-4">
+                            <h2 class="text-xl font-bold text-gray-900">${escapeHtml(cleanTitle)}</h2>
+                            <span class="inline-block px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs mt-2">
+                                ${question.difficulty || 'Medium'}
+                            </span>
+                        </div>
+                        <div class="mb-6">
+                            <h3 class="text-sm font-semibold text-gray-700 mb-2">Description</h3>
+                            <p class="text-sm text-gray-600 whitespace-pre-wrap">${escapeHtml(cleanDescription(question.description))}</p>
+                        </div>
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="text-sm font-semibold text-gray-700">Test Cases</h3>
+                            </div>
+                            <div id="test-cases-list" class="space-y-3">
+                                ${currentTestCases.length === 0 
+                                    ? '<p class="text-gray-500 text-sm">No test cases available for this question.</p>'
+                                    : currentTestCases.map((tc, idx) => `
+                                        <div class="border border-gray-200 rounded-lg p-3">
+                                            <div class="mb-2">
+                                                <span class="text-xs font-medium text-gray-700">Test Case ${idx + 1}</span>
+                                            </div>
+                                            <div class="text-xs">
+                                                <div class="mb-1">
+                                                    <span class="font-medium">Input:</span>
+                                                    <pre class="mt-1 p-2 bg-gray-50 rounded text-xs font-mono overflow-x-auto">${escapeHtml(tc.input || tc.input_file || '')}</pre>
+                                                </div>
+                                                <div>
+                                                    <span class="font-medium">Expected Output:</span>
+                                                    <pre class="mt-1 p-2 bg-gray-50 rounded text-xs font-mono overflow-x-auto">${escapeHtml(tc.expected_output || tc.output_file || '')}</pre>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `).join('')
+                                }
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    detailsDiv.innerHTML = '<p class="text-red-500">Error loading question</p>';
+                }
+            } catch (error) {
+                console.error('Error loading question:', error);
+                detailsDiv.innerHTML = '<p class="text-red-500">Error: ' + error.message + '</p>';
+            }
+        }
+
+
+        // Run code
+        async function runCode() {
+            if (!currentQuestionId) {
+                alert('Please select a question first!');
+                return;
+            }
+
+            const code = editor.getValue();
+            const language = currentLanguage;
+
+            if (!code.trim()) {
+                alert('Please write some code first!');
+                return;
+            }
+
+            if (currentTestCases.length === 0) {
+                alert('This question has no test cases!');
+                return;
+            }
+
+            const runBtn = document.getElementById('run-btn');
+            runBtn.disabled = true;
+            runBtn.textContent = 'Running...';
+
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<p class="text-blue-500">Executing code...</p>';
+
+            try {
+                // Format test cases for executor
+                const testCases = currentTestCases.map(tc => ({
+                    id: `test_${tc.id}`,
+                    input: tc.input || '',
+                    expected_output: tc.expected_output || ''
+                }));
+
+                // Try to execute through our server proxy first (to avoid CORS)
+                let response;
+                try {
+                    response = await fetch(`${API_BASE_URL.replace('/api', '')}/proxy/execute`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            language: language,
+                            code: code,
+                            test_cases: testCases,
+                            user_id: getUserId(),  // Unique user ID per browser
+                            question_id: currentQuestionId.toString(),
+                            submission_id: 'sub_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
+                        })
+                    });
+                } catch (proxyError) {
+                    // Fallback to direct connection
+                    console.log('Proxy failed, trying direct connection...');
+                    response = await fetch(`${EXECUTOR_URL}/execute`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        mode: 'cors',
+                        body: JSON.stringify({
+                            language: language,
+                            code: code,
+                            test_cases: testCases,
+                            user_id: getUserId(),  // Unique user ID per browser
+                            question_id: currentQuestionId.toString(),
+                            submission_id: 'sub_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
+                        })
+                    });
+                }
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Execution failed');
+                }
+
+                // Store execution for monitoring (always store if successful)
+                if (data.execution_id) {
+                    try {
+                        await fetch(`${API_BASE_URL}/monitoring/store`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(data)
+                        }).catch(err => console.log('Failed to store for monitoring:', err));
+                    } catch (storeError) {
+                        // Non-critical - don't fail the request
+                        console.log('Storage error (non-critical):', storeError);
+                    }
+                }
+
+                displayResults(data);
+
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                        <h4 class="font-semibold text-red-800 mb-2">Error</h4>
+                        <p class="text-red-600">${error.message}</p>
+                        <p class="text-xs text-gray-500 mt-2">Make sure the executor is accessible and CORS is enabled.</p>
+                    </div>
+                `;
+            } finally {
+                runBtn.disabled = false;
+                runBtn.textContent = '▶ Run Code';
+            }
+        }
+
+        // Display results
+        function displayResults(data) {
+            const resultsDiv = document.getElementById('results');
+            const summary = data.summary || {};
+            const testResults = data.test_results || [];
+
+            let html = `
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                    <h4 class="font-semibold text-blue-800 mb-2">Summary</h4>
+                    <div class="grid grid-cols-2 gap-4 text-sm">
+                        <div><span class="text-gray-600">Total:</span> <span class="font-semibold">${summary.total_tests || 0}</span></div>
+                        <div><span class="text-gray-600">Passed:</span> <span class="font-semibold text-green-600">${summary.passed || 0}</span></div>
+                        <div><span class="text-gray-600">Failed:</span> <span class="font-semibold text-red-600">${summary.failed || 0}</span></div>
+                        <div><span class="text-gray-600">Pass Rate:</span> <span class="font-semibold">${summary.pass_percentage || 0}%</span></div>
+                    </div>
+                    <div class="mt-3">
+                        <span class="text-gray-600">Status:</span>
+                        <span class="font-semibold ml-2 ${summary.all_passed ? 'text-green-600' : 'text-red-600'}">
+                            ${summary.all_passed ? '✓ All Tests Passed' : '✗ Some Tests Failed'}
+                        </span>
+                    </div>
+                </div>
+            `;
+
+            testResults.forEach((result) => {
+                const statusClass = result.passed ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200';
+                const statusText = result.passed ? '✓ Passed' : result.status === 'error' ? '✗ Error' : '✗ Failed';
+                const statusColor = result.passed ? 'text-green-800' : 'text-red-800';
+
+                html += `
+                    <div class="border rounded-lg p-4 ${statusClass}">
+                        <h4 class="font-semibold ${statusColor} mb-2">${statusText}</h4>
+                        <div class="space-y-2 text-sm">
+                            <div><span class="font-medium">Input:</span> <pre class="mt-1 p-2 bg-white rounded text-xs font-mono overflow-x-auto">${escapeHtml(result.input || '')}</pre></div>
+                            <div><span class="font-medium">Expected:</span> <pre class="mt-1 p-2 bg-white rounded text-xs font-mono overflow-x-auto">${escapeHtml(result.expected_output || '')}</pre></div>
+                            <div><span class="font-medium">Actual:</span> <pre class="mt-1 p-2 bg-white rounded text-xs font-mono overflow-x-auto">${escapeHtml(result.actual_output || '')}</pre></div>
+                            ${result.error ? `<div><span class="font-medium text-red-600">Error:</span> <pre class="mt-1 p-2 bg-red-100 rounded text-xs font-mono overflow-x-auto">${escapeHtml(result.error)}</pre></div>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+
+            resultsDiv.innerHTML = html;
+        }
+
+        // Reset code
+        function resetCode() {
+            if (confirm('Reset code to default?')) {
+                setDefaultCode(currentLanguage);
+            }
+        }
+
+        // Test executor connection
+        async function testExecutorConnection() {
+            const urlEl = document.getElementById('executor-url');
+            urlEl.textContent = 'Testing...';
+            
+            try {
+                // Use a proxy through our server to avoid CORS issues
+                const response = await fetch(`${API_BASE_URL.replace('/api', '')}/proxy/health`, {
+                    method: 'GET'
+                });
+                
+                if (response.ok) {
+                    urlEl.textContent = EXECUTOR_URL;
+                    urlEl.className = 'font-mono text-green-600';
+                    alert('✓ Executor connection successful!');
+                } else {
+                    throw new Error('Health check failed');
+                }
+            } catch (error) {
+                // Try direct connection as fallback
+                try {
+                    const directResponse = await fetch(`${EXECUTOR_URL}/health`, {
+                        method: 'GET',
+                        mode: 'cors'
+                    });
+                    if (directResponse.ok) {
+                        urlEl.textContent = EXECUTOR_URL;
+                        urlEl.className = 'font-mono text-green-600';
+                        alert('✓ Executor connection successful!');
+                    } else {
+                        throw new Error('Health check failed');
+                    }
+                } catch (directError) {
+                    urlEl.textContent = EXECUTOR_URL;
+                    urlEl.className = 'font-mono text-red-600';
+                    alert('✗ Executor connection failed. Check server logs or try again.');
+                    console.error('Executor connection error:', error, directError);
+                }
+            }
+        }
+
+        // Escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Strip HTML tags and convert to plain text
+        function stripHtml(html) {
+            if (!html) return '';
+            const div = document.createElement('div');
+            div.innerHTML = html;
+            return div.textContent || div.innerText || '';
+        }
+        
+        // Clean description - strip HTML and format nicely
+        function cleanDescription(description) {
+            if (!description) return 'No description available';
+            // Strip HTML tags
+            let cleaned = stripHtml(description);
+            // Remove excessive whitespace
+            cleaned = cleaned.replace(/\n{3,}/g, '\n\n');
+            // Trim
+            cleaned = cleaned.trim();
+            return cleaned || 'No description available';
+        }
+
+        // Reset user ID (for testing)
+        function resetUserId() {
+            if (confirm('Generate a new User ID? This will clear your current ID.')) {
+                localStorage.removeItem('user_id');
+                currentUserId = null;
+                const newUserId = getUserId();
+                document.getElementById('user-id-display').textContent = newUserId;
+                alert('New User ID: ' + newUserId);
+            }
+        }
+        
+        // Initialize
+        window.onload = function() {
+            document.getElementById('executor-url').textContent = EXECUTOR_URL;
+            document.getElementById('user-id-display').textContent = getUserId();
+            initEditor();
+            loadQuestions();
+        };
+    </script>
+</body>
+</html>
