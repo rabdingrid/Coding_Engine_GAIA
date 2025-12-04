@@ -17,8 +17,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Create app directory
 WORKDIR /app
 
-# Copy execution service (using secure version)
-COPY executor-service-secure.py /app/executor-service.py
+# Copy execution service
+COPY executor-service.py /app/executor-service.py
 COPY requirements.txt /app/requirements.txt
 
 # Create test_cases directory for file-based test cases
