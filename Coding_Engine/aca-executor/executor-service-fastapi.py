@@ -31,6 +31,13 @@ from slowapi.errors import RateLimitExceeded
 import asyncpg
 from contextlib import asynccontextmanager
 
+# Configure logging FIRST (before it's used)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
 # Database connection pool (will be initialized on startup)
 db_pool = None
 
@@ -81,13 +88,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
 
 # Resource limits for security
 MAX_CPU_TIME = 10  # seconds
