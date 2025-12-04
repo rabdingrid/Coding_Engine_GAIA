@@ -1,0 +1,79 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Environment variables
+.env
+.env.local
+.postgres-connection.txt
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# Test files
+test_cases/
+622797/
+*.txt
+*.json
+!package.json
+!package-lock.json
+
+# Documentation exports
+coding_question_bank_export.md
+*-export.md
+*-temp.json
+
+# Scripts (keep only essential)
+*.sh
+!deploy-and-test.sh
+
+# Azure Data Studio
+azure-data-studio.zip
+azure-data-studio-connection.json
+
+# Large markdown files (keep only essential docs)
+# Keep: STATUS.md, COMPLETE_ARCHITECTURE_DIAGRAM.md, DEPLOYMENT_DIAGRAM.md
+# Remove others or move to docs/ folder
+
+# Database dumps
+*.sql
+!test-session-table.sql
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+
+# Frontend build
+frontend/dist/
+frontend/build/
+
+# Test UI build
+test-ui/dist/
+test-ui/build/
+
