@@ -1,6 +1,0 @@
-User_ID,Language,HTTP_Code,Success,Start_Timestamp,End_Timestamp,Duration_ms,Execution_Time_ms,Container_ID,Replica_ID,CPU_Usage_%,Memory_Usage_Bytes,Test_Cases_Passed,Test_Cases_Total,All_Passed
-user_1,python,200,Yes,2025-12-05 00:03:27.724,2025-12-05 00:03:28.973,1249,331,unknown,unknown,0.00,8359936,20,20,Yes
-user_2,cpp,000,No,2025-12-05 00:03:27.724,2025-12-05 00:03:57.813,30089,0,unknown,unknown,0.00,0,0,0,No
-user_3,java,000,No,2025-12-05 00:03:27.727,2025-12-05 00:03:57.811,30083,0,unknown,unknown,0.00,0,0,0,No
-user_4,javascript,200,Yes,2025-12-05 00:03:27.729,2025-12-05 00:03:29.516,1787,905,unknown,unknown,97.30,36708352,20,20,Yes
-user_5,csharp,000,No,2025-12-05 00:03:27.729,2025-12-05 00:03:57.814,30084,0,unknown,unknown,0.00,0,0,0,No

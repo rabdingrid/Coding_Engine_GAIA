@@ -1,6 +1,0 @@
-resource_group_name = "ai-ta-2"
-container_app_env_name = "ai-ta-RA-env"
-acr_name = "aitaraacr1763805702"
-executor_image = "aitaraacr1763805702.azurecr.io/executor-fastapi:v18-fastapi"
-min_replicas = 1
-max_replicas = 3
