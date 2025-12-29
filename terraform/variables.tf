@@ -1,44 +1,68 @@
-# Variables can be overridden via terraform.tfvars or command line
+# Terraform Variables
+# These can be overridden via terraform.tfvars or environment variables
 
 variable "resource_group_name" {
-  description = "Resource group name"
+  description = "Name of the Azure Resource Group"
   type        = string
   default     = "ai-ta-2"
 }
 
-variable "location" {
-  description = "Azure region"
+variable "container_app_name" {
+  description = "Name of the Container App"
   type        = string
-  default     = "eastus2"
+  default     = "executor-refactored-test"
 }
 
 variable "container_app_env_name" {
-  description = "Container Apps Environment name"
+  description = "Name of the Container App Environment"
   type        = string
-  default     = "ai-ta-RA-env"
+  default     = "ai-ta-RA-env-testing"
 }
 
 variable "acr_name" {
-  description = "Azure Container Registry name"
+  description = "Name of the Azure Container Registry"
   type        = string
-  default     = "aitaraacr1763805702"
+  default     = "ait2codingengineacr"
 }
 
-variable "executor_image" {
-  description = "Container image for code execution"
+variable "image_name" {
+  description = "Name of the Docker image"
   type        = string
-  default     = "aitaraacr1763805702.azurecr.io/executor-secure:v17-csharp"
+  default     = "executor-service-refactored"
+}
+
+variable "image_tag" {
+  description = "Tag of the Docker image"
+  type        = string
+  default     = "latest"
 }
 
 variable "min_replicas" {
-  description = "Minimum number of pre-warmed containers (1 ready replica for cost optimization)"
+  description = "Minimum number of replicas"
   type        = number
-  default     = 1  # ✅ 1 ready replica (cost optimized)
+  default     = 1
 }
 
 variable "max_replicas" {
-  description = "Maximum number of containers (3 replicas max - can handle moderate load)"
+  description = "Maximum number of replicas"
   type        = number
-  default     = 3  # ✅ 3 replicas max (24 concurrent capacity)
+  default     = 3
 }
 
+variable "cpu" {
+  description = "CPU allocation per container"
+  type        = number
+  default     = 2.0
+}
+
+variable "memory" {
+  description = "Memory allocation per container"
+  type        = string
+  default     = "4.0Gi"
+}
+
+variable "environment" {
+  description = "Environment name (testing, staging, production)"
+  type        = string
+  default     = "testing"
+}

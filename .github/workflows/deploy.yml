@@ -1,0 +1,205 @@
+name: Deploy Code Executor to Azure
+
+on:
+  push:
+    branches:
+      - main
+      - readyfastapi
+    paths:
+      - 'executor-service/**'
+      - 'Dockerfile.fastapi'
+      - 'requirements-fastapi.txt'
+      - '.github/workflows/deploy.yml'
+  pull_request:
+    branches:
+      - main
+      - readyfastapi
+  workflow_dispatch:  # Allows manual trigger
+
+env:
+  AZURE_CONTAINER_REGISTRY: ait2codingengineacr
+  CONTAINER_APP_NAME: executor-refactored-test
+  RESOURCE_GROUP: ai-ta-2
+  CONTAINER_APP_ENV: ai-ta-RA-env-testing
+  IMAGE_NAME: executor-service-refactored
+
+jobs:
+  # Security Scanning Job
+  security-scan:
+    name: Security Scanning
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install security tools
+        run: |
+          pip install --user bandit safety pylint
+          pip install --user semgrep || echo "Semgrep installation skipped"
+
+      - name: Run Bandit
+        run: |
+          python -m bandit -r executor-service/ -f json -o bandit-results.json || true
+          python -m bandit -r executor-service/ -ll || true
+
+      - name: Run Safety (Dependency Check)
+        run: |
+          python -m safety check || true
+
+      - name: Run Semgrep
+        run: |
+          semgrep --config=auto --json --output=semgrep-results.json executor-service/ || echo "Semgrep skipped"
+        continue-on-error: true
+
+      - name: Upload security results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: security-results
+          path: |
+            bandit-results.json
+            semgrep-results.json
+
+  # Build and Deploy Job
+  build-and-deploy:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+    needs: security-scan
+    if: github.event_name != 'pull_request'  # Only deploy on push, not PRs
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Login to Azure Container Registry
+        run: |
+          az acr login --name ${{ env.AZURE_CONTAINER_REGISTRY }}
+
+      - name: Generate image tag
+        id: image-tag
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            TAG="${{ github.run_number }}-manual"
+          else
+            TAG="${{ github.run_number }}-${{ github.sha }}"
+          fi
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "Image tag: $TAG"
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.fastapi
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ steps.image-tag.outputs.tag }}
+            ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.IMAGE_NAME }}:latest
+          cache-from: type=registry,ref=${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.IMAGE_NAME }}:latest
+          cache-to: type=inline
+
+      - name: Deploy to Azure Container App
+        run: |
+          az containerapp update \
+            --name ${{ env.CONTAINER_APP_NAME }} \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --image ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ steps.image-tag.outputs.tag }}
+
+      - name: Wait for deployment
+        run: |
+          echo "Waiting for container to start..."
+          sleep 15
+
+      - name: Get Container App URL
+        id: app-url
+        run: |
+          URL=$(az containerapp show \
+            --name ${{ env.CONTAINER_APP_NAME }} \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --query "properties.configuration.ingress.fqdn" -o tsv)
+          echo "url=https://$URL" >> $GITHUB_OUTPUT
+          echo "Container App URL: https://$URL"
+
+      - name: Health check
+        run: |
+          URL="${{ steps.app-url.outputs.url }}"
+          echo "Testing health endpoint: $URL/health"
+          for i in {1..5}; do
+            if curl -f -s "$URL/health" > /dev/null; then
+              echo "✅ Health check passed!"
+              exit 0
+            fi
+            echo "Attempt $i failed, retrying..."
+            sleep 5
+          done
+          echo "❌ Health check failed after 5 attempts"
+          exit 1
+
+      - name: Deployment summary
+        run: |
+          echo "## 🚀 Deployment Successful!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Image**: \`${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ steps.image-tag.outputs.tag }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **URL**: ${{ steps.app-url.outputs.url }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit**: \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch**: \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
+
+  # Test Job (runs after deployment)
+  test-deployment:
+    name: Test Deployment
+    runs-on: ubuntu-latest
+    needs: build-and-deploy
+    if: github.event_name != 'pull_request'
+    
+    steps:
+      - name: Get Container App URL
+        id: app-url
+        run: |
+          az login --service-principal \
+            --username ${{ secrets.AZURE_CLIENT_ID }} \
+            --password ${{ secrets.AZURE_CLIENT_SECRET }} \
+            --tenant ${{ secrets.AZURE_TENANT_ID }} || true
+          
+          URL=$(az containerapp show \
+            --name ${{ env.CONTAINER_APP_NAME }} \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --query "properties.configuration.ingress.fqdn" -o tsv)
+          echo "url=https://$URL" >> $GITHUB_OUTPUT
+
+      - name: Test Health Endpoint
+        run: |
+          curl -f "${{ steps.app-url.outputs.url }}/health" || exit 1
+
+      - name: Test Python Execution
+        run: |
+          URL="${{ steps.app-url.outputs.url }}"
+          RESPONSE=$(curl -s -X POST "$URL/run" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "language": "python",
+              "code": "print(42)",
+              "sample_test_cases": [{"id": "1", "input": "", "expected_output": "42"}]
+            }')
+          
+          if echo "$RESPONSE" | grep -q '"status": "passed"'; then
+            echo "✅ Python execution test passed"
+          else
+            echo "❌ Python execution test failed"
+            echo "Response: $RESPONSE"
+            exit 1
+          fi
+

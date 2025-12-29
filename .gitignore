@@ -65,3 +65,13 @@ test-output.log
 *.o
 *.a
 
+terraform/.terraform/
+terraform/*.tfstate
+terraform/*.tfstate.backup
+terraform/.terraform.lock.hcl
+terraform/terraform.tfvars
+# Secrets files - DO NOT COMMIT
+GITHUB_SECRETS_VALUES.md
+SECRETS_EXPLANATION.md
+SECRETS_QUICK_REFERENCE.md
+ALTERNATIVE_SECRETS_SETUP.md

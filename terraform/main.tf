@@ -1,56 +1,60 @@
-# Terraform Configuration for ACA Code Executor
-# Handles 100-500 users (200-1,000 executions) with minimal pre-warmed pool
+# Terraform configuration for Code Executor Infrastructure
+# This creates the infrastructure (Container App, ACR, etc.)
 
 terraform {
+  required_version = ">= 1.0"
+  
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
       version = "~> 3.0"
     }
   }
+  
+  # Optional: Store state remotely (recommended for team)
+  # backend "azurerm" {
+  #   resource_group_name  = "terraform-state-rg"
+  #   storage_account_name = "terraformstate"
+  #   container_name       = "tfstate"
+  #   key                  = "executor.terraform.tfstate"
+  # }
 }
 
 provider "azurerm" {
   features {}
 }
 
-# Variables are defined in variables.tf
-
-# Get existing resource group
+# Data sources (existing resources)
 data "azurerm_resource_group" "main" {
-  name = var.resource_group_name
+  name = "ai-ta-2"
 }
 
-# Get existing Container Apps Environment
-data "azurerm_container_app_environment" "main" {
-  name                = var.container_app_env_name
-  resource_group_name = var.resource_group_name
-}
-
-# Get ACR
 data "azurerm_container_registry" "acr" {
-  name                = var.acr_name
-  resource_group_name = var.resource_group_name
+  name                = "ait2codingengineacr"
+  resource_group_name = data.azurerm_resource_group.main.name
 }
 
-# Container App for Code Execution
-resource "azurerm_container_app" "code_executor" {
-  name                         = "ai-ta-ra-code-executor2"
-  container_app_environment_id = data.azurerm_container_app_environment.main.id
+data "azurerm_container_app_environment" "env" {
+  name                = "ai-ta-RA-env-testing"
+  resource_group_name = data.azurerm_resource_group.main.name
+}
+
+# Container App for Code Executor
+resource "azurerm_container_app" "executor" {
+  name                         = "executor-refactored-test"
+  container_app_environment_id = data.azurerm_container_app_environment.env.id
   resource_group_name          = data.azurerm_resource_group.main.name
   revision_mode                = "Single"
 
   template {
-    # Minimal pre-warmed pool (1 container) - cost optimized for 5 users
-    # Auto-scales up to 10 during peak (5 users × 2 questions = 10 executions)
-    min_replicas = var.min_replicas
-    max_replicas = var.max_replicas
+    min_replicas = 1
+    max_replicas = 3
 
     container {
       name   = "executor"
-      image  = var.executor_image
-      cpu    = 2.0      # 2 vCPU required for 4Gi memory (Azure requirement)
-      memory = "4.0Gi"  # Increased to 4Gi to support Node.js CodeRange and Java heap
+      image  = "${data.azurerm_container_registry.acr.login_server}/executor-service-refactored:latest"
+      cpu    = 2.0
+      memory = "4.0Gi"
 
       env {
         name  = "PORT"
@@ -59,7 +63,6 @@ resource "azurerm_container_app" "code_executor" {
     }
   }
 
-  # Ingress configuration (allows external access)
   ingress {
     external_enabled = true
     target_port      = 8000
@@ -71,41 +74,35 @@ resource "azurerm_container_app" "code_executor" {
     }
   }
 
-  # Registry configuration (use username/password)
   registry {
     server   = data.azurerm_container_registry.acr.login_server
-    username = data.azurerm_container_registry.acr.admin_username
-    password_secret_name = "acr-password"
+    identity = null  # Using admin credentials
   }
-  
-  # Store ACR password as secret (must be defined before registry block)
+
   secret {
     name  = "acr-password"
     value = data.azurerm_container_registry.acr.admin_password
   }
 
   tags = {
-    environment = "production"
+    environment = "testing"
     purpose     = "code-execution"
-    capacity    = "200-students-contest"
+    managed-by  = "terraform"
   }
 }
 
-# Output: Container App URL
+# Outputs
 output "container_app_url" {
   description = "URL of the code executor"
-  value       = "https://${azurerm_container_app.code_executor.latest_revision_fqdn}"
+  value       = "https://${azurerm_container_app.executor.latest_revision_fqdn}"
 }
 
-# Output: Container App ID
-output "container_app_id" {
-  description = "ID of the code executor"
-  value       = azurerm_container_app.code_executor.id
-}
-
-# Output: Container App Name
 output "container_app_name" {
-  description = "Name of the code executor"
-  value       = azurerm_container_app.code_executor.name
+  description = "Name of the Container App"
+  value       = azurerm_container_app.executor.name
 }
 
+output "container_app_id" {
+  description = "ID of the Container App"
+  value       = azurerm_container_app.executor.id
+}
