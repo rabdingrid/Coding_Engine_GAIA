@@ -11,14 +11,9 @@ MAX_CODE_LENGTH = 100 * 1024  # 100KB
 MAX_INPUT_SIZE = 10 * 1024  # 10KB
 MAX_OUTPUT_SIZE = 10 * 1024  # 10KB
 
-# Database - SECURITY FIX: Require environment variable, no hardcoded fallback
-# Note: Will raise error when database.py tries to use it if not set
-DATABASE_URL = os.environ.get('DATABASE_URL')
-
 # Rate limits
 RATE_LIMIT_RUN = "50 per minute"
 RATE_LIMIT_RUNALL = "1000 per minute"
-RATE_LIMIT_SUBMIT = "200 per minute"
 
 # Blocked patterns for code sanitization
 BLOCKED_PATTERNS = {
