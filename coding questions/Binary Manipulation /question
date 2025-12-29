@@ -1,0 +1,89 @@
+Given an integer, convert its binary representation into a string or an array with digits indexed from 0 to the length of the binary string minus one. Reduce this binary representation to zero using specified operations:
+
+Change the ith binary digit only if (i+1)th binary digit is 1 and all other binary digits from (i+2) to the end are zeros.
+
+Change the rightmost digit without restriction.
+
+Determine the minimum number of operations required to complete this task.
+
+ 
+
+Example
+
+n = 4
+
+ 
+
+The binary representation of 4 is 100, so for the example, bin = [1, 0, 0].
+
+100 → 101 → 111 → 110 → 010 → 011 → 001 → 000
+ 
+
+bin, from left to right, has indices 0 to 3. Stepping through the operations:
+
+Use rule 2 to change bin[2] to 1. 100 → 101
+Use rule 1 to change bin[1] to 1. 101 → 111
+Use rule 2 to change bin[2] to 0. 111 → 110
+Use rule 1 to change bin[0] to 0. 110 → 010
+Use rule 2 to change bin[2] to 1. 010 → 011
+Use rule 1 to change bin[1] to 0. 011 → 001
+Use rule 2 to change bin[2] to 0. 001 → 000
+ 
+
+For this number, 7 operations are required to convert it to 0.
+
+ 
+
+Note: In the binary representation of a number, the binary digits' positions are numbered as 0 to x-1 from left to right, where x is the number of digits in the binary representation of the number.
+
+ 
+
+Function Description
+
+Complete the function minOperations in the editor with the following parameter:
+
+    long n:  the starting value in base 10
+
+ 
+
+Returns
+
+    int: the minimum number of operations required to convert n to 0
+
+ 
+
+Constraints
+
+1 ≤ n ≤ 1015
+
+ 
+
+Input Format For Custom Testing
+Sample Case 0
+Sample Input For Custom Testing
+
+STDIN     Function 
+-----     --------
+13    →   n = 13 
+Sample Output
+
+9
+Explanation
+
+The binary representation of 13 is 1101. This is the sequence of the 9 operations that change 13 to 0 according to the constraints:
+
+1101→1100→0100→0101→0111→0110→0010→0011→0001→0000
+Sample Case 1
+Sample Input For Custom Testing
+
+STDIN     Function
+-----     --------
+11     →  n = 11
+Sample Output
+
+13
+Explanation
+
+The binary representation of 11 is 1011. This is the sequence of the 13 operations that change 11 to 0 according to the constraints:
+
+1011→1010→1110→1111→1101→1100→0100→0101→0111→0110→0010→0011→0001→0000

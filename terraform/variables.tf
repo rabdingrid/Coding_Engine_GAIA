@@ -31,14 +31,14 @@ variable "executor_image" {
 }
 
 variable "min_replicas" {
-  description = "Minimum number of pre-warmed containers (for contest start)"
+  description = "Minimum number of pre-warmed containers (1 ready replica for cost optimization)"
   type        = number
-  default     = 1  # Scale to zero when idle (cost optimization)
+  default     = 1  # ✅ 1 ready replica (cost optimized)
 }
 
 variable "max_replicas" {
-  description = "Maximum number of containers (for 200 students × 2 questions = 400 executions)"
+  description = "Maximum number of containers (3 replicas max - can handle moderate load)"
   type        = number
-  default     = 3  # Limited to 3 for testing
+  default     = 3  # ✅ 3 replicas max (24 concurrent capacity)
 }
 

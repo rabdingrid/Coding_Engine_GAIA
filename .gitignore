@@ -1,0 +1,67 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+*.out
+
+# Test results
+*.json
+test_results_*.json
+*_results_*.json
+exact_timing_results_*.json
+timing_verification_results_*.json
+warehouse_boxes_results_*.json
+large_case_verification_*.json
+
+# Backups
+*.backup
+*.bak
+executor-service-fastapi.py.backup
+
+# Terraform
+.terraform/
+.terraform.lock.hcl
+terraform.tfstate
+terraform.tfstate.backup
+*.tfvars
+
+# Environment
+.env
+.env.local
+
+# Temporary files
+*.tmp
+*.temp
+test-output.log
+
+# CSV files (test results)
+*.csv
+
+# Compiled files
+*.class
+*.exe
+*.o
+*.a
+

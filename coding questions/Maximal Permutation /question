@@ -1,0 +1,109 @@
+Maximal Permutation 
+ 75 points
+ 37 minute(s)
+Algorithms  Graphs  Data Structures  Disjoint Sets  Medium  Depth First Search  Problem Solving 
+You have a circular list of integers called container. Two index arrays, firstPositions and secondPositions, along with an integer array slides, define possible swaps. For each element i in slides, determine:
+
+The index in container corresponding to firstPositions[i] - slides[i]
+The index in container corresponding to secondPositions[i] + slides[i]
+Values at these index pairs may be swapped any number of times. Find the lexicographically maximal permutation possible after performing any number of these swaps.
+
+ 
+
+Example
+
+container = [1, 2, 3, 4, 5]
+
+firstPositions = [2, 2]
+
+secondPositions = [3, 3]
+
+slides = [1, 3]
+
+ 
+
+Return: [1, 5, 3, 4, 2]
+
+ 
+
+Explanation:
+
+From slides[0], we can swap container[1] = 2 and container[4] = 5
+From slides[1], we can also swap container[4] = 5 and container[1] = 2
+Swapping these values gives [1, 5, 3, 4, 2], which is lexicographically greater than [1, 2, 3, 4, 5]
+ 
+
+Function Description
+
+ 
+
+Complete the maximalPermutation function in the editor with the following parameters:
+
+    int container[n]: the integers to permute
+
+    int firstPositions[m]: the indices to slide using operation 1
+
+    int secondPositions[m]: the indices to slide using operation 2
+
+    int slides[m]: how far to slide each index
+
+ 
+
+Returns
+
+    int[n]: the maximal permutation of container
+
+ 
+
+Constraints
+
+1 ≤ n, m ≤ 105
+1 ≤ container[j] ≤ 109 where 0 ≤  j < n
+0 ≤ firstPositions[i], secondPositions[i] < m, where 0 ≤ i < m
+0 ≤ slides[i] ≤ 109, where 0 ≤ i < m
+ 
+
+Input Format For Custom Testing
+The first line contains an integer, n,the size of container.
+
+Each line j of the n subsequent lines (where 0 ≤ j < n) contains an integer, container[j].
+
+The next line contains an integer, m, the size of firstPositions.
+
+Each line i of the m subsequent lines (where 0 ≤ i < m) contains an integer, firstPositions[i].
+
+The next line contains an integer, m, the size of secondPositions.
+
+Each line i of the m subsequent lines (where 0 ≤ i < m) contains an integer, secondPositions[i].
+
+The next line contains an integer, m, the size of slides.
+
+Each line i of the m subsequent lines (where 0 ≤ i < m) contains an integer, slides[i].
+
+Sample Case 0
+Sample Input 0
+
+STDIN       Function
+-----       --------
+4           container[] size n = 4
+2           container = [2, 4, 3, 1]
+4
+3
+1
+2           firstPostions[] size m = 2
+0           firstPostions = [0, 1]
+1
+2           secondPositions[] size m = 2
+2           secondPostions = [2, 3]
+3
+2           slides[] size m = 2
+0           slides = [0, 4]
+4
+ 
+
+Sample Output 0
+
+3
+4
+2
+1

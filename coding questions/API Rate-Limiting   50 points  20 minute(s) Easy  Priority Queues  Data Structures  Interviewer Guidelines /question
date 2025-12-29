@@ -1,0 +1,101 @@
+API Rate-Limiting 
+ 50 points
+ 20 minute(s)
+Easy  Priority Queues  Data Structures  Interviewer Guidelines 
+You are building a system that distributes API requests across n servers. Each server has a certain capacity, given by capacity[i], which is the number of requests it can handle in 1 second. After handling requests, the server’s capacity becomes half of what it was before (rounded down).
+
+ 
+
+Implement a function that returns the minimum time required to handle all incoming requests given by requests.
+
+ 
+
+The function calculateSchedulingTime takes the following inputs:
+
+    int capacity[n]:  each element denotes the capacity of the ith server 
+
+    long requests: the number of incoming API requests
+
+ 
+
+The function should return an integer, the minimum time required to process all incoming API requests.
+
+ 
+
+Example
+
+n = 5 
+
+capacity = [3, 1, 7, 2, 4]
+
+requests = 15
+
+ 
+
+The optimal solution is:
+
+First, the node with capacity = 7 schedules 7 requests in one second. Now, capacity = [3, 1, 3, 2, 4] because 7 was reduced to floor(7/2). There are 15 - 7 = 8 remaining requests.
+
+Second, the node with capacity = 4 is used. After that, capacity = [3, 1, 3, 2, 2]. Remaining requests = 8 - 4 = 4.
+
+Third, a node with capacity = 3 is used. Now, capacity = [1, 1, 3, 2, 2]. Remaining requests = 4 - 3 = 1.
+
+Finally, a node with a capacity of 1 is used to schedule the final request.
+
+ 
+
+Each step requires one second of processing time, so the answer is 4.
+
+ 
+
+Constraints
+
+1 ≤ n ≤ 105
+1 ≤ capacity[i]  ≤ 106
+1 ≤ requests ≤ 1012
+It is guaranteed that the requests can be scheduled using the given system.
+Input Format For Custom Testing
+Sample Case 0
+Sample Input For Custom Testing
+
+STDIN      Function
+-----      --------
+5      →   capacity[] size n = 5
+2      →   capacity = [2, 1, 5, 3, 1]
+1
+5
+3
+1
+17     →   requests = 17
+Sample Output
+
+9
+Explanation
+
+The optimal solution is :
+
+After choosing the servers with capacity = 2, 5, and 3, a total of 10 requests are scheduled (requiring 3 seconds, one for each server). Now, capacity = [1, 1, 2, 1, 1] and there are 17 - 10 = 7 remaining requests.
+Then choose the server with capacity = 2 to schedule 2 requests (requiring 1 second). After that, capacity = [1, 1, 1, 1, 1], and there are 7 - 2 = 5 requests remaining.
+All 5 servers are used to schedule one request each (requiring 5 seconds).
+ 
+
+The total time required is (3+1+5) = 9 seconds.
+
+Sample Case 1
+Sample Input For Custom Testing
+
+STDIN      Function
+-----      --------
+4      →   capacity[] size n = 4
+3      →   capacity = [3, 1, 4, 2]
+1
+4
+2
+3      →   requests = 3
+Sample Output
+
+1
+Explanation
+
+Choose the server with capacity = 3. All 3 requests are scheduled, and the total time required is 1 second.
+

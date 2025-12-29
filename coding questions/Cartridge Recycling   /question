@@ -1,0 +1,85 @@
+Cartridge Recycling 
+ 75 points
+ 19 minute(s)
+Ternary Search  Theme: E-commerce  Interviewer Guidelines  Math  Medium  Search 
+An office supply store offers an ink cartridge recycling program where customers can either earn money for each recycled cartridge or combine recycled cartridges with cash to buy special products known as "perks items." A customer participating in this program wants to maximize the number of perks items they can purchase. Given a specific number of cartridges and dollars, determine how many perks items the customer can acquire.
+
+ 
+
+Example
+
+cartridges = 10
+
+dollars = 10
+
+recycleReward = 2, the amount earned by recycling a single cartridge
+
+perksCost = 2, the amount required for a customer to buy a single perks item combined with a recycled cartridge
+
+ 
+
+The best thing the customer can do is to first recycle 3 cartridges, earning 6 dollars. After this, 7 cartridges and 16 dollars are left. The 7 cartridges can be combined with 14 dollars to purchase 7 perks items. This is the maximum number of perks items that can be bought.
+
+ 
+
+Function Description
+
+Complete the maxPerksItems function in the editor withthe following parameter(s):
+
+    int cartridges: the number of cartridges on-hand
+
+    int dollars: the number of dollars on-hand
+
+    int recycleReward: dollars earned per recycled cartridge
+
+    int perksCost: dollar cost of a perks item, in addition to recycling a single cartridge
+
+ 
+
+Returns
+
+    int: the maximum number of perks items that can be bought
+
+ 
+
+Constraints
+
+1 ≤ cartridges, dollars, recycleReward, perksCost ≤ 109
+
+ 
+
+Input Format For Custom Testing
+Sample Case 0
+Sample Input
+
+STDIN     Function
+-----     -----
+4      →  cartridges = 4
+8      →  dollars = 8
+3      →  recycleReward = 3
+4      →  perksCost = 4
+Sample Output
+
+2
+Explanation
+
+The optimal solution is to combine 2 cartridges with 8 dollars to buy 2 perks items. There is no way to obtain more than 2 perks items.
+
+Sample Case 1
+Sample Input
+
+STDIN     Function
+-----     -----
+3      →  cartridges = 3
+6      →  dollars = 6
+4      →  recycleReward = 4
+5      →  perksCost = 5
+Sample Output
+
+2
+Explanation
+
+The optimal solution is to first recycle 1 cartridge, earning 4 dollars. This leaves 2 cartridges and 10 dollars. The 2 cartridges can be combined with the 10 dollars to buy 2 perks items. There is no way to obtain more than 2 perks items.
+
+Interviewer Guidelines (Optional)  
+Privacy policy Terms of Service API Quick Tour Support
