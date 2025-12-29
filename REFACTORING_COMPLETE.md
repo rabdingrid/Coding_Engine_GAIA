@@ -45,18 +45,21 @@ executor-service/
 
 ### Environment Variables Required
 ```bash
-DATABASE_URL=postgresql://user:password@host:port/database?sslmode=require
 PORT=8000  # Optional, defaults to 8000
 REPLICA_NAME=replica-1  # Optional, for logging
 ```
 
+**Note**: No DATABASE_URL needed - this service doesn't use a database. It's a pure code execution engine.
+
 ## 📊 Functionality Preserved
 
-✅ All endpoints work exactly the same:
+✅ Endpoints available:
 - `/health` - Health check
 - `/run` - Sample test cases
 - `/runall` - All test cases (with C++ batch optimization)
-- `/submit` - Submit with database save
+
+❌ Removed (handled by external service):
+- `/submit` - Removed (database operations handled by another service)
 
 ✅ All features preserved:
 - Code sanitization
@@ -99,8 +102,9 @@ uvicorn main:app --host 0.0.0.0 --port 8000
 
 ## ⚠️ Important Notes
 
-- **DATABASE_URL must be set** in Azure Container Apps environment variables
+- **No DATABASE_URL needed** - This service doesn't use a database
+- **No `/submit` endpoint** - Submission handling done by external service
 - Original `executor-service-fastapi.py` kept as backup
-- All functionality preserved - just better organized
-- Same API contract - no breaking changes
+- `/run` and `/runall` endpoints work exactly the same
+- Same API contract for execution endpoints - no breaking changes
 
