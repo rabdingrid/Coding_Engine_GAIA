@@ -5,7 +5,7 @@
 ### Separate Environment for Testing
 To avoid confusion with production services, we're using a **dedicated testing environment**:
 
-**New Environment**: `cae-executor-testing`
+**Testing Environment**: `ai-ta-RA-env-testing` (Already exists!)
 - **Purpose**: Testing refactored code executor
 - **Isolation**: Separate from production environments
 - **No Conflicts**: Won't interfere with existing services
@@ -16,13 +16,13 @@ To avoid confusion with production services, we're using a **dedicated testing e
 |---------|-------------|---------|
 | `gaia-backend` | `cae-gaia-dev` | GAIA backend (dev) |
 | `ai-ta-ra-code-executor2` | `ai-ta-RA-env` | Production executor |
-| `ai-ta-ra-code-executor2.1-testing` | `cae-executor-testing` | **Testing executor** ✅ |
+| `ai-ta-ra-code-executor2.1-testing` | `ai-ta-RA-env-testing` | **Testing executor** ✅ |
 
 ## 📋 Deployment Details
 
 ### Container App
 - **Name**: `ai-ta-ra-code-executor2.1-testing`
-- **Environment**: `cae-executor-testing` (NEW - will be created)
+- **Environment**: `ai-ta-RA-env-testing` (Already exists!)
 - **Resource Group**: `ai-ta-2`
 - **Location**: `eastus2`
 
@@ -41,13 +41,9 @@ To avoid confusion with production services, we're using a **dedicated testing e
 
 ## 🚀 Deployment Steps
 
-1. **Create Environment** (if doesn't exist)
-   ```bash
-   az containerapp env create \
-     --name cae-executor-testing \
-     --resource-group ai-ta-2 \
-     --location eastus2
-   ```
+1. **Check Environment** (already exists: `ai-ta-RA-env-testing`)
+   - Environment will be created automatically if it doesn't exist
+   - Script handles this automatically
 
 2. **Build & Push Image**
    ```bash
