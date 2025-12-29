@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Execution Monitor - Admin Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .stat-card h3 {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .stat-card .value.success { color: #10b981; }
+        .stat-card .value.warning { color: #f59e0b; }
+        .stat-card .value.error { color: #ef4444; }
+        .stat-card .value.info { color: #3b82f6; }
+        
+        .controls {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .controls button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+        
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+        
+        .controls input, .controls select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            background: #f9fafb;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #374151;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        tr:hover {
+            background: #f9fafb;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-running {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .status-completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status-error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .status-validated {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .container-id {
+            font-family: monospace;
+            font-size: 12px;
+            color: #6b7280;
+        }
+        
+        .auto-refresh {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .auto-refresh input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔍 Code Execution Monitor</h1>
+        <p>Real-time monitoring of code executions across all containers</p>
+    </div>
+    
+    <div class="stats">
+        <div class="stat-card">
+            <h3>Total Executions</h3>
+            <div class="value info" id="total-executions">0</div>
+        </div>
+        <div class="stat-card">
+            <h3>Active Containers</h3>
+            <div class="value info" id="active-containers">0</div>
+        </div>
+        <div class="stat-card">
+            <h3>Success Rate</h3>
+            <div class="value success" id="success-rate">0%</div>
+        </div>
+        <div class="stat-card">
+            <h3>Avg Execution Time</h3>
+            <div class="value info" id="avg-time">0ms</div>
+        </div>
+    </div>
+    
+    <div class="controls">
+        <button class="btn-primary" onclick="loadData()">🔄 Refresh</button>
+        <button class="btn-secondary" onclick="clearData()">🗑️ Clear</button>
+        <button class="btn-success" onclick="exportData()">📥 Export CSV</button>
+        <select id="filter-user" onchange="filterData()">
+            <option value="">All Users</option>
+        </select>
+        <select id="filter-status" onchange="filterData()">
+            <option value="">All Status</option>
+            <option value="running">Running</option>
+            <option value="completed">Completed</option>
+            <option value="error">Error</option>
+        </select>
+        <div class="auto-refresh">
+            <input type="checkbox" id="auto-refresh" checked onchange="toggleAutoRefresh()">
+            <label for="auto-refresh">Auto-refresh (5s)</label>
+        </div>
+    </div>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Time</th>
+                    <th>User ID</th>
+                    <th>Question ID</th>
+                    <th>Submission ID</th>
+                    <th>Language</th>
+                    <th>Container ID</th>
+                    <th>Status</th>
+                    <th>Tests Passed</th>
+                    <th>Time (ms)</th>
+                    <th>CPU %</th>
+                    <th>Memory (MB)</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="executions-table">
+                <tr>
+                    <td colspan="10" style="text-align: center; padding: 40px; color: #6b7280;">
+                        Loading executions...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <script>
+        const API_BASE_URL = 'http://localhost:3001/api';
+        const EXECUTOR_URL = 'https://ai-ta-ra-code-executor2.happypond-428960e8.eastus2.azurecontainerapps.io';
+        
+        let executions = [];
+        let autoRefreshInterval = null;
+        
+        // Load execution data from backend
+        async function loadData() {
+            try {
+                // Add cache-busting parameter to prevent stale data
+                const response = await fetch(`${API_BASE_URL}/monitoring/executions?t=${Date.now()}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    executions = data.executions || [];
+                    // Sort by timestamp (newest first) - server should already sort, but ensure it
+                    executions.sort((a, b) => {
+                        const timeA = new Date(a.timestamp || a.stored_at || 0).getTime();
+                        const timeB = new Date(b.timestamp || b.stored_at || 0).getTime();
+                        return timeB - timeA; // Newest first
+                    });
+                    updateStats();
+                    renderTable();
+                    updateUserFilter();
+                } else {
+                    console.error('Failed to load executions:', data.error);
+                    showError('Failed to load executions: ' + (data.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error loading data:', error);
+                showError('Error loading data. Make sure the monitoring API is running at ' + API_BASE_URL);
+            }
+        }
+        
+        // Show error message
+        function showError(message) {
+            document.getElementById('executions-table').innerHTML = `
+                <tr>
+                    <td colspan="12" style="text-align: center; padding: 40px; color: #ef4444;">
+                        ${message}<br>
+                        <small style="color: #6b7280; margin-top: 10px; display: block;">
+                            Make sure the Node.js server is running: <code>cd test-ui && npm start</code>
+                        </small>
+                    </td>
+                </tr>
+            `;
+        }
+        
+        // Update statistics
+        function updateStats() {
+            const total = executions.length;
+            const completed = executions.filter(e => e.status === 'completed' || e.status === 'error').length;
+            const active = executions.filter(e => e.status === 'running').length;
+            
+            // Calculate success: all_passed OR (tests_passed === tests_total)
+            const success = executions.filter(e => {
+                if (e.all_passed === true) return true;
+                if (e.tests_passed !== undefined && e.tests_total !== undefined) {
+                    return e.tests_passed === e.tests_total && e.tests_total > 0;
+                }
+                // Fallback: if status is completed and not error, consider it success
+                return e.status === 'completed' && e.status !== 'error';
+            }).length;
+            
+            const avgTime = executions.length > 0 
+                ? Math.round(executions.reduce((sum, e) => sum + (e.execution_time_ms || 0), 0) / executions.length)
+                : 0;
+            
+            document.getElementById('total-executions').textContent = total;
+            document.getElementById('active-containers').textContent = active;
+            document.getElementById('success-rate').textContent = total > 0 
+                ? Math.round((success / total) * 100) + '%' 
+                : '0%';
+            document.getElementById('avg-time').textContent = avgTime + 'ms';
+        }
+        
+        // Render table
+        function renderTable() {
+            const tbody = document.getElementById('executions-table');
+            const filterUser = document.getElementById('filter-user').value;
+            const filterStatus = document.getElementById('filter-status').value;
+            
+            let filtered = executions;
+            if (filterUser) {
+                filtered = filtered.filter(e => e.user_id === filterUser);
+            }
+            if (filterStatus) {
+                filtered = filtered.filter(e => e.status === filterStatus);
+            }
+            
+            if (filtered.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="12" style="text-align: center; padding: 40px; color: #6b7280;">
+                            No executions found
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            // Sort by timestamp (newest first)
+            filtered.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            
+            tbody.innerHTML = filtered.map(exec => `
+                <tr>
+                    <td>${new Date(exec.timestamp).toLocaleTimeString()}</td>
+                    <td><strong>${exec.user_id || 'N/A'}</strong></td>
+                    <td>${exec.question_id || 'N/A'}</td>
+                    <td class="container-id">${exec.submission_id || exec.execution_id || 'N/A'}</td>
+                    <td>${exec.language || 'N/A'}</td>
+                    <td class="container-id">${exec.container_id || exec.replica_name || 'unknown'}</td>
+                    <td>
+                        <span class="status-badge status-${exec.status || 'completed'}">
+                            ${exec.status || 'completed'}
+                        </span>
+                    </td>
+                    <td>${exec.tests_passed || 0}/${exec.tests_total || 0}</td>
+                    <td>${exec.execution_time_ms || 0}ms</td>
+                    <td>${(typeof exec.cpu_usage_percent === 'number') ? exec.cpu_usage_percent.toFixed(1) + '%' : 'N/A'}</td>
+                    <td>${(typeof exec.memory_usage_mb === 'number') ? exec.memory_usage_mb.toFixed(2) + ' MB' : 'N/A'}</td>
+                    <td>
+                        <button onclick="viewDetails('${exec.execution_id}')" style="padding: 4px 8px; border: none; background: #3b82f6; color: white; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                            View
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        // Update user filter dropdown
+        function updateUserFilter() {
+            const users = [...new Set(executions.map(e => e.user_id).filter(Boolean))];
+            const select = document.getElementById('filter-user');
+            const currentValue = select.value;
+            
+            select.innerHTML = '<option value="">All Users</option>' + 
+                users.map(u => `<option value="${u}">${u}</option>`).join('');
+            
+            if (currentValue && users.includes(currentValue)) {
+                select.value = currentValue;
+            }
+        }
+        
+        // Filter data
+        function filterData() {
+            renderTable();
+        }
+        
+        // Clear data
+        function clearData() {
+            if (confirm('Clear all execution data?')) {
+                executions = [];
+                updateStats();
+                renderTable();
+            }
+        }
+        
+        // Export data
+        function exportData() {
+            const csv = [
+                ['Time', 'User ID', 'Question ID', 'Submission ID', 'Language', 'Container ID', 'Status', 'Tests Passed', 'Execution Time (ms)', 'CPU %', 'Memory (MB)'],
+                ...executions.map(e => [
+                    e.timestamp,
+                    e.user_id || '',
+                    e.question_id || '',
+                    e.submission_id || e.execution_id || '',
+                    e.language || '',
+                    e.container_id || e.replica_name || 'unknown',
+                    e.status || 'completed',
+                    `${e.tests_passed || 0}/${e.tests_total || 0}`,
+                    e.execution_time_ms || 0,
+                    (typeof e.cpu_usage_percent === 'number') ? e.cpu_usage_percent.toFixed(1) : 'N/A',
+                    (typeof e.memory_usage_mb === 'number') ? e.memory_usage_mb.toFixed(2) : 'N/A'
+                ])
+            ].map(row => row.join(',')).join('\n');
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `executions-${new Date().toISOString()}.csv`;
+            a.click();
+        }
+        
+        // View details
+        function viewDetails(executionId) {
+            const exec = executions.find(e => e.execution_id === executionId);
+            if (exec) {
+                alert(JSON.stringify(exec, null, 2));
+            }
+        }
+        
+        // Show error message
+        function showError(message) {
+            document.getElementById('executions-table').innerHTML = `
+                <tr>
+                    <td colspan="12" style="text-align: center; padding: 40px; color: #ef4444;">
+                        ${message}<br>
+                        <small style="color: #6b7280; margin-top: 10px; display: block;">
+                            Make sure the Node.js server is running: <code>cd test-ui && npm start</code>
+                        </small>
+                    </td>
+                </tr>
+            `;
+        }
+        
+        // Toggle auto-refresh
+        function toggleAutoRefresh() {
+            // Clear existing interval first
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+                autoRefreshInterval = null;
+            }
+            
+            const enabled = document.getElementById('auto-refresh').checked;
+            if (enabled) {
+                // Start auto-refresh immediately and then every 5 seconds
+                loadData(); // Load immediately
+                autoRefreshInterval = setInterval(loadData, 5000);
+            }
+        }
+        
+        // Initialize
+        window.onload = function() {
+            loadData();
+            // Start auto-refresh if checkbox is checked (default: checked)
+            if (document.getElementById('auto-refresh').checked) {
+                autoRefreshInterval = setInterval(loadData, 5000);
+            }
+        };
+    </script>
+</body>
+</html>
+

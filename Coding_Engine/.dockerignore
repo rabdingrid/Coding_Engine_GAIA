@@ -1,0 +1,100 @@
+# Exclude language packages (4GB+ of Git LFS files)
+# These will be installed on-demand after deployment
+language-packages/
+**/language-packages/
+language-packages/**
+
+# Exclude ALL git files and LFS objects (4GB+)
+.git/
+.git/**
+.gitignore
+.gitattributes
+**/.git/
+**/.git/**
+
+# Exclude other ignore files
+.railwayignore
+.dockerignore.railway
+railway.toml
+railway.json
+.DS_Store
+**/.DS_Store
+
+# Exclude test files (not needed in container)
+test_cases/
+**/test_cases/
+test_cases/**
+
+# Exclude documentation
+*.md
+**/*.md
+README.md
+RAILWAY_BUILD_SOLUTION.md
+AZURE_DEPLOYMENT_README.md
+DEPLOYMENT_STATUS.md
+AKS_DEPLOYMENT_GUIDE.md
+QUICK_START_AKS.md
+DEPLOY_TO_RAILWAY.md
+
+# Exclude deployment scripts
+deploy-*.sh
+**/deploy-*.sh
+azure-deploy.sh
+deploy-azure-container-apps.sh
+deploy-aks.sh
+
+# Exclude other dockerfiles (only need Dockerfile.personal)
+Dockerfile.railway
+Dockerfile.railway.build
+Dockerfile.azure
+Dockerfile.aks
+**/Dockerfile.railway*
+**/Dockerfile.azure*
+
+# Exclude Python cache
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+**/*.pyc
+**/*.pyo
+
+# Exclude Mac files
+.DS_Store
+**/.DS_Store
+*.swp
+*.swo
+*~
+
+# Exclude frontend (not needed in backend image)
+frontend/
+**/frontend/
+frontend/**
+
+# Exclude node modules if any
+node_modules/
+**/node_modules/
+node_modules/**
+
+# Exclude local development files
+docker-compose*.yml
+**/docker-compose*.yml
+
+# Exclude k8s manifests (not needed in image)
+k8s/
+k8s-personal/
+**/k8s/
+**/k8s-*/
+
+# Exclude any other large files
+*.log
+*.tmp
+*.cache
+**/*.log
+**/*.tmp
+
+# Only include what's needed:
+# - Dockerfile.personal
+# - nginx.conf (if needed)
+# - Any small config files

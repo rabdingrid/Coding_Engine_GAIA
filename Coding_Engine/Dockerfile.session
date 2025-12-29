@@ -1,0 +1,98 @@
+FROM ghcr.io/engineer-man/piston:latest
+
+RUN mkdir -p /piston/packages
+
+# Install packages during build
+RUN echo "deb http://archive.debian.org/debian buster main" > /etc/apt/sources.list && \
+    echo "deb http://archive.debian.org/debian-security buster/updates main" >> /etc/apt/sources.list || true && \
+    apt-get update || true && \
+    apt-get install -y curl socat && \
+    (node /piston_api/src/index.js > /tmp/piston.log 2>&1 &) && \
+    sleep 20 && \
+    curl -X POST http://localhost:2000/api/v2/packages -H "Content-Type: application/json" -d '{"language":"python", "version":"3.10.0"}' && \
+    sleep 20 && \
+    curl -X POST http://localhost:2000/api/v2/packages -H "Content-Type: application/json" -d '{"language":"c++", "version":"10.2.0"}' && \
+    sleep 20 && \
+    curl -X POST http://localhost:2000/api/v2/packages -H "Content-Type: application/json" -d '{"language":"java", "version":"15.0.2"}' && \
+    sleep 20 && \
+    curl -X POST http://localhost:2000/api/v2/packages -H "Content-Type: application/json" -d '{"language":"javascript", "version":"16.3.0"}' && \
+    sleep 20 && \
+    pkill node
+
+# Copy adapter service
+COPY adapter-service.js /app/adapter-service.js
+
+# Create startup script
+RUN echo '#!/bin/bash\n\
+set -e\n\
+\n\
+check_port() {\n\
+  local port=$1\n\
+  for i in {1..30}; do\n\
+    if curl -s http://localhost:$port/api/v2/runtimes > /dev/null 2>&1; then\n\
+      return 0\n\
+    fi\n\
+    sleep 1\n\
+  done\n\
+  return 1\n\
+}\n\
+\n\
+echo "=========================================="\n\
+echo "Starting Piston on default port 2000..."\n\
+echo "=========================================="\n\
+cd /piston_api\n\
+node src/index.js > /tmp/piston.log 2>&1 &\n\
+PISTON_PID=$!\n\
+\n\
+sleep 5\n\
+if check_port 2000; then\n\
+  echo "✅ Piston is ready on port 2000"\n\
+else\n\
+  echo "❌ ERROR: Piston failed to start"\n\
+  cat /tmp/piston.log | tail -50\n\
+  exit 1\n\
+fi\n\
+\n\
+echo "Setting up port forwarding 2001->2000..."\n\
+socat TCP-LISTEN:2001,fork,reuseaddr TCP:localhost:2000 > /tmp/socat.log 2>&1 &\n\
+SOCAT_PID=$!\n\
+sleep 2\n\
+\n\
+if curl -s http://localhost:2001/api/v2/runtimes > /dev/null 2>&1; then\n\
+  echo "✅ Port forwarding working (2001->2000)"\n\
+else\n\
+  echo "⚠️  Port forwarding may not be working, but continuing..."\n\
+fi\n\
+\n\
+echo "=========================================="\n\
+echo "Starting Azure Session Pool Adapter..."\n\
+echo "CONTAINER_APP_PORT: ${CONTAINER_APP_PORT:-not set, using 2000}"\n\
+echo "=========================================="\n\
+node /app/adapter-service.js > /tmp/adapter.log 2>&1 &\n\
+ADAPTER_PID=$!\n\
+\n\
+sleep 3\n\
+ADAPTER_PORT=${CONTAINER_APP_PORT:-2000}\n\
+if curl -s http://localhost:$ADAPTER_PORT/health > /dev/null 2>&1; then\n\
+  echo "✅ Adapter is ready on port $ADAPTER_PORT"\n\
+else\n\
+  echo "❌ ERROR: Adapter failed to start on port $ADAPTER_PORT"\n\
+  cat /tmp/adapter.log\n\
+  exit 1\n\
+fi\n\
+\n\
+echo ""\n\
+echo "✅ All services running:"\n\
+echo "   - Piston: localhost:2000 (direct)"\n\
+echo "   - Piston: localhost:2001 (via socat)"\n\
+echo "   - Adapter: localhost:$ADAPTER_PORT (Azure endpoint)"\n\
+echo ""\n\
+\n\
+# Keep container alive\n\
+wait $PISTON_PID $ADAPTER_PID $SOCAT_PID\n\
+' > /app/start.sh && chmod +x /app/start.sh
+
+# EXPOSE matches --target-port in session pool (2000)
+EXPOSE 2000
+
+CMD ["/app/start.sh"]
